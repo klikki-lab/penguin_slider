@@ -1,0 +1,509 @@
+{
+	"width": 1280,
+	"height": 720,
+	"fps": 30,
+	"main": "./script/_bootstrap.js",
+	"maxPoints": 1,
+	"assets": {
+		"img_smoke": {
+			"type": "image",
+			"path": "image/img_smoke.png",
+			"width": 32,
+			"height": 32
+		},
+		"img_snow_covered_01": {
+			"type": "image",
+			"path": "image/img_snow_covered_01.png",
+			"width": 92,
+			"height": 62
+		},
+		"img_snow_covered_02": {
+			"type": "image",
+			"path": "image/img_snow_covered_02.png",
+			"width": 92,
+			"height": 64
+		},
+		"img_ice_cube": {
+			"type": "image",
+			"path": "image/img_ice_cube.png",
+			"width": 80,
+			"height": 80
+		},
+		"img_penguin_beak": {
+			"type": "image",
+			"path": "image/img_penguin_beak.png",
+			"width": 24,
+			"height": 12
+		},
+		"img_penguin": {
+			"type": "image",
+			"path": "image/img_penguin.png",
+			"width": 80,
+			"height": 80
+		},
+		"img_penguin_tail": {
+			"type": "image",
+			"path": "image/img_penguin_tail.png",
+			"width": 20,
+			"height": 10
+		},
+		"img_snowflake_01": {
+			"type": "image",
+			"path": "image/img_snowflake_01.png",
+			"width": 42,
+			"height": 48
+		},
+		"img_snowflake_02": {
+			"type": "image",
+			"path": "image/img_snowflake_02.png",
+			"width": 56,
+			"height": 64
+		},
+		"img_font": {
+			"type": "image",
+			"path": "image/img_font.png",
+			"width": 700,
+			"height": 150
+		},
+		"font_glyphs": {
+			"type": "text",
+			"path": "text/font_glyphs.json"
+		},
+		"img_snowflake_03": {
+			"type": "image",
+			"path": "image/img_snowflake_03.png",
+			"width": 56,
+			"height": 64
+		},
+		"img_crush": {
+			"type": "image",
+			"path": "image/img_crush.png",
+			"width": 80,
+			"height": 90
+		},
+		"img_background": {
+			"type": "image",
+			"path": "image/img_background.png",
+			"width": 1280,
+			"height": 722
+		},
+		"img_splash": {
+			"type": "image",
+			"path": "image/img_splash.png",
+			"width": 80,
+			"height": 128
+		},
+		"img_speedometer": {
+			"type": "image",
+			"path": "image/img_speedometer.png",
+			"width": 80,
+			"height": 80
+		},
+		"img_speedometer_needle": {
+			"type": "image",
+			"path": "image/img_speedometer_needle.png",
+			"width": 4,
+			"height": 32
+		},
+		"img_blackout": {
+			"type": "image",
+			"path": "image/img_blackout.png",
+			"width": 2560,
+			"height": 720
+		},
+		"se_splash": {
+			"type": "audio",
+			"path": "audio/se_splash",
+			"systemId": "sound",
+			"duration": 774,
+			"hint": {
+				"extensions": [
+					".m4a",
+					".ogg"
+				]
+			}
+		},
+		"img_snowflake_04": {
+			"type": "image",
+			"path": "image/img_snowflake_04.png",
+			"width": 56,
+			"height": 64
+		},
+		"img_snowflake_05": {
+			"type": "image",
+			"path": "image/img_snowflake_05.png",
+			"width": 56,
+			"height": 64
+		},
+		"img_distant_star": {
+			"type": "image",
+			"path": "image/img_distant_star.png",
+			"width": 8,
+			"height": 8
+		},
+		"img_how_to_play": {
+			"type": "image",
+			"path": "image/img_how_to_play.png",
+			"width": 950,
+			"height": 300
+		},
+		"img_title_logo": {
+			"type": "image",
+			"path": "image/img_title_logo.png",
+			"width": 871,
+			"height": 185
+		},
+		"img_wall": {
+			"type": "image",
+			"path": "image/img_wall.png",
+			"width": 160,
+			"height": 560
+		},
+		"img_finish": {
+			"type": "image",
+			"path": "image/img_finish.png",
+			"width": 397,
+			"height": 144
+		},
+		"img_start": {
+			"type": "image",
+			"path": "image/img_start.png",
+			"width": 390,
+			"height": 133
+		},
+		"se_spawn_ice_cube": {
+			"type": "audio",
+			"path": "audio/se_spawn_ice_cube",
+			"systemId": "sound",
+			"duration": 929,
+			"hint": {
+				"extensions": [
+					".m4a",
+					".ogg"
+				]
+			}
+		},
+		"se_obtain": {
+			"type": "audio",
+			"path": "audio/se_obtain",
+			"systemId": "sound",
+			"duration": 596,
+			"hint": {
+				"extensions": [
+					".m4a",
+					".ogg"
+				]
+			}
+		},
+		"se_crush": {
+			"type": "audio",
+			"path": "audio/se_crush",
+			"systemId": "sound",
+			"duration": 1087,
+			"hint": {
+				"extensions": [
+					".m4a",
+					".ogg"
+				]
+			}
+		},
+		"se_hitting_head": {
+			"type": "audio",
+			"path": "audio/se_hitting_head",
+			"systemId": "sound",
+			"duration": 129,
+			"hint": {
+				"extensions": [
+					".m4a",
+					".ogg"
+				]
+			}
+		},
+		"img_pause_message": {
+			"type": "image",
+			"path": "image/img_pause_message.png",
+			"width": 720,
+			"height": 96
+		},
+		"smoke": {
+			"type": "script",
+			"path": "script/game_scene/effect/smoke.js",
+			"global": true
+		},
+		"smokes": {
+			"type": "script",
+			"path": "script/game_scene/effect/smokes.js",
+			"global": true
+		},
+		"snow": {
+			"type": "script",
+			"path": "script/game_scene/effect/snow.js",
+			"global": true
+		},
+		"snowSmoke": {
+			"type": "script",
+			"path": "script/game_scene/effect/snowSmoke.js",
+			"global": true
+		},
+		"splash": {
+			"type": "script",
+			"path": "script/game_scene/effect/splash.js",
+			"global": true
+		},
+		"entity": {
+			"type": "script",
+			"path": "script/game_scene/entity/entity.js",
+			"global": true
+		},
+		"ice_cube": {
+			"type": "script",
+			"path": "script/game_scene/entity/ice_cube.js",
+			"global": true
+		},
+		"penguin": {
+			"type": "script",
+			"path": "script/game_scene/entity/penguin.js",
+			"global": true
+		},
+		"scoreLabel": {
+			"type": "script",
+			"path": "script/game_scene/hud/scoreLabel.js",
+			"global": true
+		},
+		"speedometer": {
+			"type": "script",
+			"path": "script/game_scene/hud/speedometer.js",
+			"global": true
+		},
+		"timeLabel": {
+			"type": "script",
+			"path": "script/game_scene/hud/timeLabel.js",
+			"global": true
+		},
+		"snowFlake": {
+			"type": "script",
+			"path": "script/game_scene/stage/snowFlake.js",
+			"global": true
+		},
+		"stageLayer": {
+			"type": "script",
+			"path": "script/game_scene/stage/stageLayer.js",
+			"global": true
+		},
+		"wall": {
+			"type": "script",
+			"path": "script/game_scene/stage/wall.js",
+			"global": true
+		},
+		"snowLayer": {
+			"type": "script",
+			"path": "script/game_scene/effect/snowLayer.js",
+			"global": true
+		},
+		"img_speech_bubble": {
+			"type": "image",
+			"path": "image/img_speech_bubble.png",
+			"width": 288,
+			"height": 86
+		},
+		"speechBubble": {
+			"type": "script",
+			"path": "script/game_scene/effect/speechBubble.js",
+			"global": true
+		},
+		"img_snow": {
+			"type": "image",
+			"path": "image/img_snow.png",
+			"width": 64,
+			"height": 64
+		},
+		"img_msg_excellent": {
+			"type": "image",
+			"path": "image/img_msg_excellent.png",
+			"width": 118,
+			"height": 24
+		},
+		"img_msg_good": {
+			"type": "image",
+			"path": "image/img_msg_good.png",
+			"width": 69,
+			"height": 25
+		},
+		"img_msg_here_we_go": {
+			"type": "image",
+			"path": "image/img_msg_here_we_go.png",
+			"width": 127,
+			"height": 24
+		},
+		"img_msg_nice": {
+			"type": "image",
+			"path": "image/img_msg_nice.png",
+			"width": 61,
+			"height": 24
+		},
+		"img_msg_superb": {
+			"type": "image",
+			"path": "image/img_msg_superb.png",
+			"width": 95,
+			"height": 27
+		},
+		"img_msg_thanks": {
+			"type": "image",
+			"path": "image/img_msg_thanks.png",
+			"width": 96,
+			"height": 24
+		},
+		"spawnSmoke": {
+			"type": "script",
+			"path": "script/game_scene/effect/spawnSmoke.js",
+			"global": true
+		},
+		"img_cloud": {
+			"type": "image",
+			"path": "image/img_cloud.png",
+			"width": 164,
+			"height": 96
+		},
+		"img_moon": {
+			"type": "image",
+			"path": "image/img_moon.png",
+			"width": 96,
+			"height": 96
+		},
+		"splashFragments": {
+			"type": "script",
+			"path": "script/game_scene/effect/splashFragments.js",
+			"global": true
+		},
+		"img_start_button": {
+			"type": "image",
+			"path": "image/img_start_button.png",
+			"width": 524,
+			"height": 100
+		},
+		"audioController": {
+			"type": "script",
+			"path": "script/common/audioController.js",
+			"global": true
+		},
+		"button": {
+			"type": "script",
+			"path": "script/common/button.js",
+			"global": true
+		},
+		"collision": {
+			"type": "script",
+			"path": "script/common/collision.js",
+			"global": true
+		},
+		"countdownTimer": {
+			"type": "script",
+			"path": "script/common/countdownTimer.js",
+			"global": true
+		},
+		"customLoadingScene": {
+			"type": "script",
+			"path": "script/common/customLoadingScene.js",
+			"global": true
+		},
+		"mouseButtonHoldRepeater": {
+			"type": "script",
+			"path": "script/common/mouseButtonHoldRepeater.js",
+			"global": true
+		},
+		"blackout": {
+			"type": "script",
+			"path": "script/game_scene/effect/blackout.js",
+			"global": true
+		},
+		"cloud": {
+			"type": "script",
+			"path": "script/game_scene/effect/cloud.js",
+			"global": true
+		},
+		"crush": {
+			"type": "script",
+			"path": "script/game_scene/effect/crush.js",
+			"global": true
+		},
+		"popupScore": {
+			"type": "script",
+			"path": "script/game_scene/effect/popupScore.js",
+			"global": true
+		},
+		"gameScene": {
+			"type": "script",
+			"path": "script/game_scene/gameScene.js",
+			"global": true
+		},
+		"speedController": {
+			"type": "script",
+			"path": "script/game_scene/speedController.js",
+			"global": true
+		},
+		"main": {
+			"type": "script",
+			"path": "script/main.js",
+			"global": true
+		},
+		"parameterObject": {
+			"type": "script",
+			"path": "script/parameterObject.js",
+			"global": true
+		},
+		"titleScene": {
+			"type": "script",
+			"path": "script/title_scene/titleScene.js",
+			"global": true
+		},
+		"_bootstrap": {
+			"type": "script",
+			"path": "script/_bootstrap.js",
+			"global": true
+		},
+		"img_drift_ice": {
+			"type": "image",
+			"path": "image/img_drift_ice.png",
+			"width": 98,
+			"height": 46
+		},
+		"driftIce": {
+			"type": "script",
+			"path": "script/game_scene/effect/driftIce.js",
+			"global": true
+		},
+		"bgm_nc366054": {
+			"type": "audio",
+			"path": "audio/bgm_nc366054",
+			"systemId": "music",
+			"duration": 60709,
+			"hint": {
+				"extensions": [
+					".m4a",
+					".ogg"
+				]
+			}
+		}
+	},
+	"moduleMainScripts": {
+		"@akashic-extension/akashic-timeline": "node_modules/@akashic-extension/akashic-timeline/lib/index.js"
+	},
+	"environment": {
+		"sandbox-runtime": "3",
+		"nicolive": {
+			"supportedModes": [
+				"ranking"
+			],
+			"preferredSessionParameters": {
+				"totalTimeLimit": 80
+			}
+		}
+	},
+	"globalScripts": [
+		"node_modules/@akashic-extension/akashic-timeline/lib/ActionType.js",
+		"node_modules/@akashic-extension/akashic-timeline/lib/Easing.js",
+		"node_modules/@akashic-extension/akashic-timeline/lib/Timeline.js",
+		"node_modules/@akashic-extension/akashic-timeline/lib/Tween.js",
+		"node_modules/@akashic-extension/akashic-timeline/lib/index.js"
+	]
+}
