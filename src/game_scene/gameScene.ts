@@ -387,7 +387,7 @@ export class GameScene extends g.Scene {
                     }
                 }
             }
-            this.updateBackgroung(0);
+            this.updateBackgroung();
         });
     };
 
@@ -418,7 +418,7 @@ export class GameScene extends g.Scene {
             this.moveCamera(this.penguin.offsetX());
         }
 
-        this.updateBackgroung(speedRate);
+        this.updateBackgroung();
     };
 
     private updateStage = (speedRate: number): void => {
@@ -667,15 +667,7 @@ export class GameScene extends g.Scene {
         new Splash(this, this.effectBackLayer, x);
     };
 
-    private updateBackgroung = (speedRate: number): void => {
-        // this.clouds.children.forEach(cloud => {
-        //     if (cloud instanceof Cloud) cloud.setVelocityX(speedRate);
-        // });
-
-        // if (g.game.age % g.game.fps === 0 && g.game.random.generate() < .2) {
-        //     this.clouds.append(new Cloud(this, speedRate));
-        // }
-
+    private updateBackgroung = (): void => {
         if (g.game.age % (g.game.fps * 3) === 0 && g.game.random.generate() < .2) {
             this.driftIces.append(new DriftIce(this));
         }
