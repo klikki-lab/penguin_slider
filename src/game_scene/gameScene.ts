@@ -26,7 +26,7 @@ import { StageLayer } from "./stage/stageLayer";
 import { Wall } from "./stage/wall";
 
 const Music = {
-    BGM: "bgm_nc366054",
+    BGM: "bgm_nc392136",
 } as const;
 
 const Sounds = {
@@ -83,7 +83,7 @@ export class GameScene extends g.Scene {
                 "img_blackout", "img_start", "img_finish", "img_snow", "img_pause_message",
                 "img_speech_bubble", "img_msg_superb", "img_msg_excellent", "img_msg_nice", "img_msg_good", "img_msg_thanks",
                 "img_font", "font_glyphs",
-                "se_splash", "se_spawn_ice_cube", "se_obtain", "se_crush", "se_hitting_head", "bgm_nc366054",
+                "se_splash", "se_spawn_ice_cube", "se_obtain", "se_crush", "se_hitting_head", Music.BGM,
             ],
         });
 
@@ -94,7 +94,7 @@ export class GameScene extends g.Scene {
         this.holdRepeater = new MouseButtonHoldRepeater();
         this.speedController = new SpeedController();
 
-        this.audioController = new AudioController(0.1, 0.1);
+        this.audioController = new AudioController(0.2, 0.1);
         const sounds = [
             { assetId: Sounds.SPLASH },
             { assetId: Sounds.SPAWN_ICE_CUBE },
@@ -104,31 +104,6 @@ export class GameScene extends g.Scene {
         ];
         this.audioController.addSE(this.asset, sounds);
         this.audioController.addMusic(this.asset, [{ assetId: Music.BGM }]);
-
-        const musicAsset = this.asset.getAudioById(Music.BGM);
-        const volume = 0.05;
-        const audioPlayerContext = new g.AudioPlayContext({
-            id: Music.BGM,
-            resourceFactory: g.game.resourceFactory,
-            system: new g.MusicAudioSystem({ id: Music.BGM, resourceFactory: g.game.resourceFactory }),
-            systemId: Music.BGM,
-            asset: musicAsset,
-            volume: volume,
-        });
-        /**
-         * 
-         * @param t 経過時間 time
-         * @param b 開始位置（開始音量？）
-         * @param c 差分（0 - 開始音量？）
-         * @param d 所要時間 duration
-         */
-        const easingFunc = (t: number, b: number, c: number, d: number): number => {
-            console.log(`経過時間:${t}, 開始位置:${b}, 差分:${c}, 所要時間:${d}`);
-            const v = t < musicAsset.duration - 5000 ? volume : ((musicAsset.duration - t) / 5000) * volume;
-            return v;
-        }
-        const transitionCOntext = g.AudioUtil.fadeOut(g.game, audioPlayerContext, musicAsset.duration, easingFunc);
-        // audioPlayerContext.play();
 
         this.camera = new g.Camera2D({});
         g.game.focusingCamera = this.camera;
@@ -215,6 +190,7 @@ export class GameScene extends g.Scene {
             .wait(Blackout.DURATION_TRANSITION)
             .moveX(-blackout.width, Blackout.DURATION_TRANSITION)
             .call(() => {
+                this.audioController.playMusic(Music.BGM);
                 blackout.destroy();
                 this.showStart();
             });
@@ -244,7 +220,6 @@ export class GameScene extends g.Scene {
             .fadeOut(duration, tl.Easing.easeInQuint)
             .con()
             .call(() => {
-                //this.audioController.playMusic(Music.BGM);
                 this.onUpdate.add(this.updateHandler);
                 this.onPointDownCapture.add(this.pointDownHandler);
                 this.onPointUpCapture.add(this.pointUpHandler);
