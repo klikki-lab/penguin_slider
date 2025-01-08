@@ -67,5 +67,5 @@ export class DriftIce extends g.Sprite {
 
     private getHeight = (): number => this.height * this.scaleY;
 
-    setVelocityX = (speedRate: number): void => { this.vx = this.getWidth() / g.game.fps * speedRate * .75; }
+    setVelocityX = (speedRate: number): void => { this.vx = this.getWidth() / g.game.fps * speedRate; }
 }

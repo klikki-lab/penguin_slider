@@ -676,7 +676,7 @@ export class GameScene extends g.Scene {
         //     this.clouds.append(new Cloud(this, speedRate));
         // }
 
-        if (g.game.age % (g.game.fps * 3) === 0 && g.game.random.generate() < .1) {
+        if (g.game.age % (g.game.fps * 3) === 0 && g.game.random.generate() < .2) {
             this.driftIces.append(new DriftIce(this));
         }
     };
