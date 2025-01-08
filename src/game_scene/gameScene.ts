@@ -67,7 +67,7 @@ export class GameScene extends g.Scene {
     private holdRepeater: MouseButtonHoldRepeater;
     private pauseMessage: g.Sprite;
     private blackout: g.Sprite;
-
+    private context: g.AudioPlayContext;
     private isPauseGame = false;
 
     constructor(private param: GameMainParameterObject, private isClicked: boolean, private timeLimit: number) {
@@ -104,6 +104,22 @@ export class GameScene extends g.Scene {
         ];
         this.audioController.addSE(this.asset, sounds);
         this.audioController.addMusic(this.asset, [{ assetId: Music.BGM }]);
+
+        // const musicAudioSystem = new g.MusicAudioSystem({
+        //     id: Music.BGM,
+        //     // volume: 0.2,
+        //     resourceFactory: g.game.resourceFactory,
+        // });
+        // this.context = new g.AudioPlayContext({
+        //     id: Music.BGM,
+        //     resourceFactory: g.game.resourceFactory,
+        //     system: musicAudioSystem,
+        //     systemId: Music.BGM,
+        //     asset: this.asset.getAudioById(Music.BGM),
+        //     volume: 0.2,
+        // })
+        // this.context.play();
+        //g.AudioUtil.fadeOut(g.game, context, 5);
 
         this.camera = new g.Camera2D({});
         g.game.focusingCamera = this.camera;
@@ -328,6 +344,11 @@ export class GameScene extends g.Scene {
             .wait(duration * 8)
             .call(() => {
                 bubble.destroy();
+
+                const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
+                const elapsedSec = Math.ceil(g.game.age / g.game.fps) + 1;
+                const duration = (totalTimeLimit - elapsedSec) * 1000;
+                this.audioController.fadeOut(Music.BGM, duration);
                 this.runAwayPenguin();
             });
 

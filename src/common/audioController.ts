@@ -1,7 +1,6 @@
 interface Musics {
     [key: string]: {
-        readonly audio: g.AudioAsset;
-        readonly volume: number;
+        readonly audioAssetContext: g.AudioPlayContext;
     }
 }
 
@@ -38,22 +37,36 @@ export class AudioController {
 
     addMusic = (asset: g.AssetAccessor, params: MusicParams[]): void => {
         params.forEach(param => {
-            const volumeRate = param.volumeRate ?? 1;
+            const musicAudioSystem = new g.MusicAudioSystem({
+                id: param.assetId,
+                resourceFactory: g.game.resourceFactory,
+            });
+            const audioPlayContext = new g.AudioPlayContext({
+                id: param.assetId,
+                resourceFactory: g.game.resourceFactory,
+                system: musicAudioSystem,
+                systemId: param.assetId,
+                asset: asset.getAudioById(param.assetId),
+                volume: this.musicVolume * g.Util.clamp(param.volumeRate ?? 1, 0, 1),
+            })
             this.musics[param.assetId] = {
-                audio: asset.getAudioById(param.assetId),
-                volume: this.musicVolume * g.Util.clamp(volumeRate, 0, 1),
+                audioAssetContext: audioPlayContext,
             };
         });
     };
 
-    playMusic = (assetId: string): g.AudioPlayer => {
+    playMusic = (assetId: string): g.AudioPlayContext => {
         const music = this.musics[assetId];
-        const player = music.audio.play();
-        player.changeVolume(music.volume);
-        return player;
-    }
+        const context = music.audioAssetContext;
+        context.play();
+        return context;
+    };
 
-    stopMusic = (assetId: string): void => this.musics[assetId].audio.stop();
+    stopMusic = (assetId: string): void => this.musics[assetId].audioAssetContext.stop();
+
+    fadeOut = (assetId: string, duration: number): g.AudioTransitionContext =>
+        g.AudioUtil.fadeOut(g.game, this.musics[assetId].audioAssetContext, duration);
+
 
     addSE = (asset: g.AssetAccessor, params: SoundParams[]): void => {
         params.forEach(param => {
