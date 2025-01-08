@@ -9,8 +9,8 @@ export function main(param: GameMainParameterObject): void {
         playThreshold: 100,
         clearThreshold: undefined,
     };
-    g.game.audio.music.volume = 0.1;
-    g.game.audio.sound.volume = 0.1;
+    // g.game.audio.music.volume = 0.1;
+    // g.game.audio.sound.volume = 0.1;
     g.game.loadingScene = new CustomLoadingScene();
 
     const titleScene = new TitleScene(7);

@@ -472,11 +472,11 @@
 			"path": "script/game_scene/effect/driftIce.js",
 			"global": true
 		},
-		"bgm_nc392136": {
+		"bgm_nc366054": {
 			"type": "audio",
-			"path": "audio/bgm_nc392136",
+			"path": "audio/bgm_nc366054",
 			"systemId": "music",
-			"duration": 132337,
+			"duration": 55579,
 			"hint": {
 				"extensions": [
 					".m4a",

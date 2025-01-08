@@ -26,7 +26,7 @@ import { StageLayer } from "./stage/stageLayer";
 import { Wall } from "./stage/wall";
 
 const Music = {
-    BGM: "bgm_nc392136",
+    BGM: "bgm_nc366054",
 } as const;
 
 const Sounds = {
@@ -190,7 +190,6 @@ export class GameScene extends g.Scene {
             .wait(Blackout.DURATION_TRANSITION)
             .moveX(-blackout.width, Blackout.DURATION_TRANSITION)
             .call(() => {
-                this.audioController.playMusic(Music.BGM);
                 blackout.destroy();
                 this.showStart();
             });
@@ -215,6 +214,8 @@ export class GameScene extends g.Scene {
             .con()
             .fadeIn(duration, tl.Easing.easeOutQuint)
             .wait(wait)
+            .con()
+            .call(() => this.audioController.playMusic(Music.BGM))
             .moveX(-start.width / 2, duration, tl.Easing.easeInQuint)
             .con()
             .fadeOut(duration, tl.Easing.easeInQuint)
