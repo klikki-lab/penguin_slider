@@ -1,24 +1,88 @@
-export class DriftIce extends g.Sprite {
+import { Collision } from "../../common/collision";
 
-    private vx = 0;
+export class DriftIces extends g.E {
 
-    constructor(scene: g.Scene) {
+    private static readonly MAX_COUNT = 8;
+    private driftIces: DriftIce[] = [];
+
+    constructor(scene: g.Scene, parent: g.Scene | g.E, private maxCount = DriftIces.MAX_COUNT) {
+        super({ scene: scene, parent: parent });
+
+        for (let i = 0; i < maxCount; i++) {
+            this.driftIces.push(new DriftIce(scene, this));
+        }
+
+        this.onUpdate.add(this.updateHandler);
+    }
+
+    private updateHandler = (): void => {
+        this.driftIces.forEach(driftIce => {
+            driftIce.x += driftIce.vx;
+            driftIce.modified();
+
+            if (driftIce.x + driftIce.getWidth() / 2 < 0) {
+                this.initPos(driftIce);
+                this.children.sort((e1: g.E, e2: g.E) => e1.y - e2.y);
+            }
+        });
+
+        for (let i = 0; i < this.maxCount - 1; i++) {
+            const driftIce = this.driftIces[i];
+            for (let j = i + 1; j < this.maxCount; j++) {
+                const target = this.driftIces[j];
+                if (Collision.within(driftIce, target)) {
+                    const temp = target.vx;
+                    target.vx = Math.min(driftIce.vx * 0.98, this.calcVelocityX(target, 0.5));
+                    driftIce.vx = Math.min(temp * 0.98, this.calcVelocityX(driftIce, 0.5));
+                }
+            }
+        }
+    };
+
+    private initPos = (driftIce: DriftIce): void => {
+        const seaHeight = 256;
+        const rate = g.game.random.generate();
+        const scaleRate = rate * .5 + .5;
+        driftIce.scaleX = scaleRate * (g.game.random.generate() < .5 ? -1 : 1);
+        driftIce.scaleY = scaleRate;
+        driftIce.vx = this.calcVelocityX(driftIce, scaleRate);
+
+        driftIce.x = g.game.random.generate() * g.game.width + g.game.width + driftIce.getWidth() / 2;
+        driftIce.y = g.game.height - seaHeight + driftIce.getHeight() * .4 + rate * (seaHeight - driftIce.height * 4);
+
+        if (this.driftIces.filter(ice => ice !== driftIce && Collision.within(driftIce, ice)).length > 0) {
+            this.initPos(driftIce);
+        }
+        driftIce.modified();
+
+        const penguin = driftIce.children[0];
+        if (penguin) {
+            penguin.scaleX = driftIce.scaleX * .5;
+            penguin.scaleY = driftIce.scaleY * .5;
+            penguin.modified();
+        }
+    };
+
+    init = (): void => {
+        this.driftIces.forEach(driftIce => this.initPos(driftIce));
+        this.children.sort((e1: g.E, e2: g.E) => e1.y - e2.y);
+    };
+
+    private calcVelocityX = (driftIce: DriftIce, speedRate: number): number => -driftIce.getWidth() / g.game.fps * speedRate;
+}
+
+class DriftIce extends g.Sprite {
+
+    vx = 0;
+
+    constructor(scene: g.Scene, parent: g.Scene | g.E) {
         super({
             scene: scene,
+            parent: parent,
             src: scene.asset.getImageById("img_drift_ice"),
             anchorX: .5,
             anchorY: .5,
         });
-
-        const seaHeight = 256;
-        const rate = g.game.random.generate();
-        const scaleRate = rate * .5 + .5;
-        this.scaleX = scaleRate * (g.game.random.generate() < .5 ? -1 : 1);
-        this.scaleY = scaleRate;
-        this.x = g.game.width + this.getWidth() / 2;
-        this.y = g.game.height - seaHeight + this.getHeight() * .4 + rate * (seaHeight - this.height * 4);
-
-        this.setVelocityX(scaleRate);
 
         const penguin = new g.Sprite({
             scene: scene,
@@ -28,8 +92,6 @@ export class DriftIce extends g.Sprite {
             y: this.height / 2,
             anchorX: .5,
             anchorY: 1,
-            scaleX: scaleRate * .4,
-            scaleY: scaleRate * .4,
         });
 
         const beak = new g.Sprite({
@@ -50,22 +112,9 @@ export class DriftIce extends g.Sprite {
         });
         tail.x = 0;
         tail.y = penguin.height * .9;
-
-        this.onUpdate.add(this.updateHandler);
     }
 
-    private updateHandler = (): void => {
-        this.x -= this.vx;
-        this.modified();
+    getWidth = (): number => this.width * Math.abs(this.scaleX);
 
-        if (this.x + this.getWidth() / 2 < 0) {
-            this.destroy();
-        }
-    };
-
-    private getWidth = (): number => this.width * Math.abs(this.scaleX);
-
-    private getHeight = (): number => this.height * this.scaleY;
-
-    setVelocityX = (speedRate: number): void => { this.vx = this.getWidth() / g.game.fps * speedRate; }
+    getHeight = (): number => this.height * this.scaleY;
 }

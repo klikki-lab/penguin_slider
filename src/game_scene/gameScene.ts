@@ -7,7 +7,7 @@ import { GameMainParameterObject } from "../parameterObject";
 import { Blackout } from "./effect/blackout";
 import { Clouds } from "./effect/cloud";
 import { Crush } from "./effect/crush";
-import { DriftIce } from "./effect/driftIce";
+import { DriftIces } from "./effect/driftIce";
 import { PopupScore } from "./effect/popupScore";
 import { SnowLayer } from "./effect/snowLayer";
 import { SnowSmoke } from "./effect/snowSmoke";
@@ -51,7 +51,7 @@ export class GameScene extends g.Scene {
     private speedController: SpeedController;
     private backgroundLayer: g.E;
     private clouds: Clouds;
-    private driftIces: g.E;
+    private driftIces: DriftIces;
     private stageLayer: StageLayer;
     private effectBackLayer: g.E;
     private effectMiddleLayer: g.E;
@@ -250,6 +250,7 @@ export class GameScene extends g.Scene {
         this.penguin.init();
         this.stageLayer.init();
         this.clouds.init();
+        this.driftIces.init();
         this.holdRepeater.init(false);
 
         const clearChildren = (e: g.E): void => {
@@ -267,7 +268,6 @@ export class GameScene extends g.Scene {
         clearChildren(this.effectFrontLayer);
         clearChildren(this.effectMiddleLayer);
         clearChildren(this.effectBackLayer);
-        clearChildren(this.driftIces);
     };
 
     private finishGame = (): void => {
@@ -386,6 +386,13 @@ export class GameScene extends g.Scene {
 
             for (let i = 0; i < velocity.x; i++) {
                 if (this.penguin.x - this.penguin.getWidth() < this.camera.x + g.game.width) {
+                    const bottom = this.collideBottom(this.penguin, 1);
+                    if (bottom) {
+                        this.penguin.onGround(bottom);
+                    } else {
+                        this.penguin.y += 1;
+                    }
+
                     this.penguin.x += 1;
                     this.penguin.modified();
 
@@ -408,7 +415,6 @@ export class GameScene extends g.Scene {
                     }
                 }
             }
-            this.updateBackgroung();
         });
     };
 
@@ -438,8 +444,6 @@ export class GameScene extends g.Scene {
         if (this.camera.x < this.penguin.offsetX()) {
             this.moveCamera(this.penguin.offsetX());
         }
-
-        this.updateBackgroung();
     };
 
     private updateStage = (speedRate: number): void => {
@@ -686,12 +690,6 @@ export class GameScene extends g.Scene {
         new Splash(this, this.effectBackLayer, x);
     };
 
-    private updateBackgroung = (): void => {
-        if (g.game.age % (g.game.fps * 3) === 0 && g.game.random.generate() < .2) {
-            this.driftIces.append(new DriftIce(this));
-        }
-    };
-
     private retryGame = (): void => {
         if (this.speechBubbleTween && !this.speechBubbleTween.isFinished()) {
             this.speechBubbleTween.cancel(true);
@@ -809,17 +807,7 @@ export class GameScene extends g.Scene {
         backgroung.append(moon);
 
         this.clouds = new Clouds(this, layer);
-
-        this.driftIces = new g.E({ scene: this, parent: layer });
-        this.driftIces.children = [];
-        // const sea = new g.FilledRect({
-        //     scene: this,
-        //     parent: layer,
-        //     width: g.game.width,
-        //     height: 200,
-        //     cssColor: "#4f8fe9ff",
-        // });
-        // sea.y = g.game.height - sea.height;
+        this.driftIces = new DriftIces(this, layer);
 
         return layer;
     };
