@@ -225,91 +225,11 @@
 			"width": 720,
 			"height": 96
 		},
-		"smoke": {
-			"type": "script",
-			"path": "script/game_scene/effect/smoke.js",
-			"global": true
-		},
-		"smokes": {
-			"type": "script",
-			"path": "script/game_scene/effect/smokes.js",
-			"global": true
-		},
-		"snow": {
-			"type": "script",
-			"path": "script/game_scene/effect/snow.js",
-			"global": true
-		},
-		"snowSmoke": {
-			"type": "script",
-			"path": "script/game_scene/effect/snowSmoke.js",
-			"global": true
-		},
-		"splash": {
-			"type": "script",
-			"path": "script/game_scene/effect/splash.js",
-			"global": true
-		},
-		"entity": {
-			"type": "script",
-			"path": "script/game_scene/entity/entity.js",
-			"global": true
-		},
-		"ice_cube": {
-			"type": "script",
-			"path": "script/game_scene/entity/ice_cube.js",
-			"global": true
-		},
-		"penguin": {
-			"type": "script",
-			"path": "script/game_scene/entity/penguin.js",
-			"global": true
-		},
-		"scoreLabel": {
-			"type": "script",
-			"path": "script/game_scene/hud/scoreLabel.js",
-			"global": true
-		},
-		"speedometer": {
-			"type": "script",
-			"path": "script/game_scene/hud/speedometer.js",
-			"global": true
-		},
-		"timeLabel": {
-			"type": "script",
-			"path": "script/game_scene/hud/timeLabel.js",
-			"global": true
-		},
-		"snowFlake": {
-			"type": "script",
-			"path": "script/game_scene/stage/snowFlake.js",
-			"global": true
-		},
-		"stageLayer": {
-			"type": "script",
-			"path": "script/game_scene/stage/stageLayer.js",
-			"global": true
-		},
-		"wall": {
-			"type": "script",
-			"path": "script/game_scene/stage/wall.js",
-			"global": true
-		},
-		"snowLayer": {
-			"type": "script",
-			"path": "script/game_scene/effect/snowLayer.js",
-			"global": true
-		},
 		"img_speech_bubble": {
 			"type": "image",
 			"path": "image/img_speech_bubble.png",
 			"width": 288,
 			"height": 86
-		},
-		"speechBubble": {
-			"type": "script",
-			"path": "script/game_scene/effect/speechBubble.js",
-			"global": true
 		},
 		"img_snow": {
 			"type": "image",
@@ -353,11 +273,6 @@
 			"width": 96,
 			"height": 24
 		},
-		"spawnSmoke": {
-			"type": "script",
-			"path": "script/game_scene/effect/spawnSmoke.js",
-			"global": true
-		},
 		"img_cloud": {
 			"type": "image",
 			"path": "image/img_cloud.png",
@@ -370,16 +285,29 @@
 			"width": 96,
 			"height": 96
 		},
-		"splashFragments": {
-			"type": "script",
-			"path": "script/game_scene/effect/splashFragments.js",
-			"global": true
-		},
 		"img_start_button": {
 			"type": "image",
 			"path": "image/img_start_button.png",
 			"width": 524,
 			"height": 100
+		},
+		"img_drift_ice": {
+			"type": "image",
+			"path": "image/img_drift_ice.png",
+			"width": 110,
+			"height": 74
+		},
+		"bgm_nc366054": {
+			"type": "audio",
+			"path": "audio/bgm_nc366054",
+			"systemId": "music",
+			"duration": 55579,
+			"hint": {
+				"extensions": [
+					".m4a",
+					".ogg"
+				]
+			}
 		},
 		"audioController": {
 			"type": "script",
@@ -426,9 +354,74 @@
 			"path": "script/game_scene/effect/crush.js",
 			"global": true
 		},
+		"driftIce": {
+			"type": "script",
+			"path": "script/game_scene/effect/driftIce.js",
+			"global": true
+		},
 		"popupScore": {
 			"type": "script",
 			"path": "script/game_scene/effect/popupScore.js",
+			"global": true
+		},
+		"smoke": {
+			"type": "script",
+			"path": "script/game_scene/effect/smoke.js",
+			"global": true
+		},
+		"smokes": {
+			"type": "script",
+			"path": "script/game_scene/effect/smokes.js",
+			"global": true
+		},
+		"snow": {
+			"type": "script",
+			"path": "script/game_scene/effect/snow.js",
+			"global": true
+		},
+		"snowLayer": {
+			"type": "script",
+			"path": "script/game_scene/effect/snowLayer.js",
+			"global": true
+		},
+		"snowSmoke": {
+			"type": "script",
+			"path": "script/game_scene/effect/snowSmoke.js",
+			"global": true
+		},
+		"spawnSmoke": {
+			"type": "script",
+			"path": "script/game_scene/effect/spawnSmoke.js",
+			"global": true
+		},
+		"speechBubble": {
+			"type": "script",
+			"path": "script/game_scene/effect/speechBubble.js",
+			"global": true
+		},
+		"splash": {
+			"type": "script",
+			"path": "script/game_scene/effect/splash.js",
+			"global": true
+		},
+		"splashFragments": {
+			"type": "script",
+			"path": "script/game_scene/effect/splashFragments.js",
+			"global": true
+		},
+		"entity": {
+			"type": "script",
+			"path": "script/game_scene/entity/entity.js",
+			"global": true
+		},
+		"ice_cube": {
+			"type": "script",
+			"path": "script/game_scene/entity/ice_cube.js",
+			"global": true
+		},
+		"penguin": {
+			"type": "script",
+			"path": "script/game_scene/entity/penguin.js",
 			"global": true
 		},
 		"gameScene": {
@@ -436,9 +429,39 @@
 			"path": "script/game_scene/gameScene.js",
 			"global": true
 		},
+		"scoreLabel": {
+			"type": "script",
+			"path": "script/game_scene/hud/scoreLabel.js",
+			"global": true
+		},
+		"speedometer": {
+			"type": "script",
+			"path": "script/game_scene/hud/speedometer.js",
+			"global": true
+		},
+		"timeLabel": {
+			"type": "script",
+			"path": "script/game_scene/hud/timeLabel.js",
+			"global": true
+		},
 		"speedController": {
 			"type": "script",
 			"path": "script/game_scene/speedController.js",
+			"global": true
+		},
+		"snowFlake": {
+			"type": "script",
+			"path": "script/game_scene/stage/snowFlake.js",
+			"global": true
+		},
+		"stageLayer": {
+			"type": "script",
+			"path": "script/game_scene/stage/stageLayer.js",
+			"global": true
+		},
+		"wall": {
+			"type": "script",
+			"path": "script/game_scene/stage/wall.js",
 			"global": true
 		},
 		"main": {
@@ -460,29 +483,6 @@
 			"type": "script",
 			"path": "script/_bootstrap.js",
 			"global": true
-		},
-		"img_drift_ice": {
-			"type": "image",
-			"path": "image/img_drift_ice.png",
-			"width": 98,
-			"height": 46
-		},
-		"driftIce": {
-			"type": "script",
-			"path": "script/game_scene/effect/driftIce.js",
-			"global": true
-		},
-		"bgm_nc366054": {
-			"type": "audio",
-			"path": "audio/bgm_nc366054",
-			"systemId": "music",
-			"duration": 55579,
-			"hint": {
-				"extensions": [
-					".m4a",
-					".ogg"
-				]
-			}
 		}
 	},
 	"moduleMainScripts": {

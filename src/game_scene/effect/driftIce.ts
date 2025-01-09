@@ -14,7 +14,7 @@ export class DriftIces extends g.E {
             this.driftIces.push(new DriftIce(scene, asset, this));
         }
 
-        this.speed = asset.width / g.game.fps * 1.1;
+        this.speed = asset.width / g.game.fps * 1.05;
         this.onUpdate.add(this.updateHandler);
     }
 
@@ -46,13 +46,12 @@ export class DriftIces extends g.E {
         const seaHeight = 256;
         const rate = g.game.random.generate();
         const scaleRate = rate * .5 + .5;
-        const speedRate = scaleRate * (g.game.random.generate() < .5 ? -1 : 1);
-        driftIce.scaleX = speedRate;
+        driftIce.scaleX = scaleRate * (g.game.random.generate() < .5 ? -1 : 1);
         driftIce.scaleY = scaleRate;
-        driftIce.vx = this.calcVelocityX(driftIce, speedRate);
+        driftIce.vx = this.calcVelocityX(driftIce, scaleRate);
 
         driftIce.x = g.game.random.generate() * g.game.width + g.game.width + driftIce.getWidth() / 2;
-        driftIce.y = g.game.height - seaHeight + driftIce.getHeight() * .4 + rate * (seaHeight - driftIce.height * 4);
+        driftIce.y = g.game.height - seaHeight + rate * driftIce.getHeight();
 
         if (this.driftIces.filter(ice => ice !== driftIce && Collision.within(driftIce, ice)).length >= 1) {
             this.initPos(driftIce);
@@ -78,15 +77,14 @@ class DriftIce extends g.Sprite {
             parent: parent,
             src: asset,
             anchorX: .5,
-            anchorY: .5,
         });
 
         const penguin = new g.Sprite({
             scene: scene,
             parent: this,
             src: scene.asset.getImageById("img_penguin"),
-            x: this.width / 2,
-            y: this.height / 2,
+            x: this.width * .5,
+            y: this.height * .3,
             anchorX: .5,
             anchorY: 1,
             scaleX: .5,
