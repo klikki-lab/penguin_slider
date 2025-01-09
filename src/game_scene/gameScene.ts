@@ -501,8 +501,6 @@ export class GameScene extends g.Scene {
                                 this.scoreLabel.addScore(snowflake.score);
                                 new SplashFragments(this, this.effectMiddleLayer, snowflake);
 
-                                const pos = { x: this.scoreLabel.x + this.scoreLabel.width, y: this.scoreLabel.y + this.scoreLabel.height * .4 };
-                                // const pos = { x: snowflake.x  , y: snowflake.y };
                                 const popupScore = new PopupScore(this, this.bitmapFont, snowflake.score);
                                 popupScore.x = this.scoreLabel.x + this.scoreLabel.width - popupScore.width;
                                 popupScore.y = this.scoreLabel.y + this.scoreLabel.height;
