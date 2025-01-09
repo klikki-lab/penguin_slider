@@ -106,22 +106,6 @@ export class GameScene extends g.Scene {
         this.audioController.addSE(this.asset, sounds);
         this.audioController.addMusic(this.asset, [{ assetId: Music.BGM }]);
 
-        // const musicAudioSystem = new g.MusicAudioSystem({
-        //     id: Music.BGM,
-        //     // volume: 0.2,
-        //     resourceFactory: g.game.resourceFactory,
-        // });
-        // this.context = new g.AudioPlayContext({
-        //     id: Music.BGM,
-        //     resourceFactory: g.game.resourceFactory,
-        //     system: musicAudioSystem,
-        //     systemId: Music.BGM,
-        //     asset: this.asset.getAudioById(Music.BGM),
-        //     volume: 0.2,
-        // })
-        // this.context.play();
-        //g.AudioUtil.fadeOut(g.game, context, 5);
-
         this.camera = new g.Camera2D({});
         g.game.focusingCamera = this.camera;
         g.game.modified();
@@ -258,11 +242,7 @@ export class GameScene extends g.Scene {
             const children = e.children;
             for (let i = children.length - 1; i >= 0; i--) {
                 const entity = children[i];
-                if (entity instanceof g.Sprite) {
-                    entity.destroy(true);
-                } else {
-                    entity.destroy();
-                }
+                entity.destroy();
             }
         };
         clearChildren(this.iceCubes);
