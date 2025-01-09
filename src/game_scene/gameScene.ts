@@ -291,7 +291,7 @@ export class GameScene extends g.Scene {
                 });
         } else {
             const bubbles = this.penguin.children.filter(e => e instanceof SpeechBubble);
-            if (bubbles && bubbles.length > 0) {
+            if (bubbles && bubbles.length > 0 && (bubbles[0] instanceof SpeechBubble)) {
                 this.speechBubbleTween = this.createSpeechBubbleTimeline(bubbles[0], duration);
             }
         }
@@ -305,16 +305,17 @@ export class GameScene extends g.Scene {
         bubble.opacity = 0;
         bubble.x = -this.penguin.width / 2;
         bubble.y = this.penguin.height * (isUp ? -0.5 : 1.25);
-        if (isUp) {
-            bubble.onUpdate.add(() => {
-                if (this.penguin.y <= Penguin.SIZE * 2) {
-                    bubble.down();
-                    bubble.y = this.penguin.height * 1.25;
-                    bubble.modified();
-                    return true;
-                }
-            })
-        }
+        bubble.onUpdate.add(() => {
+            if (bubble.isUp() && this.penguin.y <= Penguin.SIZE * 2) {
+                bubble.down();
+                bubble.y = this.penguin.height * 1.25;
+                bubble.modified();
+            } else if (!bubble.isUp() && this.penguin.y > Penguin.SIZE * 2) {
+                bubble.up();
+                bubble.y = this.penguin.height * -0.5;
+                bubble.modified();
+            }
+        });
         return bubble;
     };
 
