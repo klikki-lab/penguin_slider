@@ -2,22 +2,25 @@ import { Collision } from "../../common/collision";
 
 export class DriftIces extends g.E {
 
-    private static readonly MAX_COUNT = 8;
+    private static readonly MAX_COUNT = 5;
     private driftIces: DriftIce[] = [];
+    private speed = 0;
 
     constructor(scene: g.Scene, parent: g.Scene | g.E, private maxCount = DriftIces.MAX_COUNT) {
         super({ scene: scene, parent: parent });
 
+        const asset = scene.asset.getImageById("img_drift_ice");
         for (let i = 0; i < maxCount; i++) {
-            this.driftIces.push(new DriftIce(scene, this));
+            this.driftIces.push(new DriftIce(scene, asset, this));
         }
 
+        this.speed = asset.width / g.game.fps * 1.1;
         this.onUpdate.add(this.updateHandler);
     }
 
     private updateHandler = (): void => {
         this.driftIces.forEach(driftIce => {
-            driftIce.x += driftIce.vx;
+            driftIce.x += driftIce.vx - this.speed;
             driftIce.modified();
 
             if (driftIce.x + driftIce.getWidth() / 2 < 0) {
@@ -32,8 +35,8 @@ export class DriftIces extends g.E {
                 const target = this.driftIces[j];
                 if (Collision.within(driftIce, target)) {
                     const temp = target.vx;
-                    target.vx = Math.min(driftIce.vx * 0.98, this.calcVelocityX(target, 0.5));
-                    driftIce.vx = Math.min(temp * 0.98, this.calcVelocityX(driftIce, 0.5));
+                    target.vx = driftIce.vx * .98;
+                    driftIce.vx = temp * .98;
                 }
             }
         }
@@ -43,24 +46,18 @@ export class DriftIces extends g.E {
         const seaHeight = 256;
         const rate = g.game.random.generate();
         const scaleRate = rate * .5 + .5;
-        driftIce.scaleX = scaleRate * (g.game.random.generate() < .5 ? -1 : 1);
+        const speedRate = scaleRate * (g.game.random.generate() < .5 ? -1 : 1);
+        driftIce.scaleX = speedRate;
         driftIce.scaleY = scaleRate;
-        driftIce.vx = this.calcVelocityX(driftIce, scaleRate);
+        driftIce.vx = this.calcVelocityX(driftIce, speedRate);
 
         driftIce.x = g.game.random.generate() * g.game.width + g.game.width + driftIce.getWidth() / 2;
         driftIce.y = g.game.height - seaHeight + driftIce.getHeight() * .4 + rate * (seaHeight - driftIce.height * 4);
 
-        if (this.driftIces.filter(ice => ice !== driftIce && Collision.within(driftIce, ice)).length > 0) {
+        if (this.driftIces.filter(ice => ice !== driftIce && Collision.within(driftIce, ice)).length >= 1) {
             this.initPos(driftIce);
         }
         driftIce.modified();
-
-        const penguin = driftIce.children[0];
-        if (penguin) {
-            penguin.scaleX = driftIce.scaleX * .5;
-            penguin.scaleY = driftIce.scaleY * .5;
-            penguin.modified();
-        }
     };
 
     init = (): void => {
@@ -68,18 +65,18 @@ export class DriftIces extends g.E {
         this.children.sort((e1: g.E, e2: g.E) => e1.y - e2.y);
     };
 
-    private calcVelocityX = (driftIce: DriftIce, speedRate: number): number => -driftIce.getWidth() / g.game.fps * speedRate;
+    private calcVelocityX = (driftIce: DriftIce, speedRate: number): number => driftIce.getWidth() / g.game.fps * speedRate;
 }
 
 class DriftIce extends g.Sprite {
 
     vx = 0;
 
-    constructor(scene: g.Scene, parent: g.Scene | g.E) {
+    constructor(scene: g.Scene, asset: g.ImageAsset | g.Surface, parent: g.Scene | g.E) {
         super({
             scene: scene,
             parent: parent,
-            src: scene.asset.getImageById("img_drift_ice"),
+            src: asset,
             anchorX: .5,
             anchorY: .5,
         });
@@ -92,6 +89,8 @@ class DriftIce extends g.Sprite {
             y: this.height / 2,
             anchorX: .5,
             anchorY: 1,
+            scaleX: .5,
+            scaleY: .5,
         });
 
         const beak = new g.Sprite({

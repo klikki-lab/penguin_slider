@@ -463,6 +463,9 @@ export class GameScene extends g.Scene {
 
         this.hudLayer.x = cameraX;
         this.hudLayer.modified();
+
+        // this.driftIces.x = cameraX;
+        // this.driftIces.modified();
     };
 
     private updatePenguin = (velocity: g.CommonOffset, speedRate: number): void => {
