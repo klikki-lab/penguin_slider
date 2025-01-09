@@ -346,7 +346,7 @@ export class GameScene extends g.Scene {
                 bubble.destroy();
 
                 const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
-                const elapsedSec = Math.floor(g.game.age / g.game.fps) + 1;
+                const elapsedSec = Math.floor(g.game.age / g.game.fps) + 2;
                 const duration = (totalTimeLimit - elapsedSec) * 1000;
                 this.audioController.fadeOut(Music.BGM, duration);
                 this.runAwayPenguin();
