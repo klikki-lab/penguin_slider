@@ -337,7 +337,7 @@ export class GameScene extends g.Scene {
 
     private calcResultMessage = () => {
         const collectRate = this.penguin.collectedSnowFlake / (this.stageLayer.snowFlakeCount + 1);
-        // console.log(`no miss: ${this.penguin.isNoMiss()}` +
+        // console.log(`missCount: ${this.penguin.missCount}` +
         //     ` ,collectRate: ${collectRate}` +
         //     ` ,collected: ${this.penguin.collectedSnowFlake}` +
         //     ` ,count: ${this.stageLayer.snowFlakeCount}`);
@@ -348,9 +348,10 @@ export class GameScene extends g.Scene {
             else if (collectRate >= 0.8) return "img_msg_nice";
             else if (collectRate >= 0.7) return "img_msg_good";
         }
-        if (collectRate >= 1.0) return "img_msg_excellent";
+        const missCount = this.penguin.missCount;
+        if (missCount <= 1 && collectRate >= 1.0) return "img_msg_excellent";
         else if (collectRate >= 0.9) return "img_msg_nice";
-        else if (collectRate >= 0.8) return "img_msg_good";
+        else if (collectRate >= 0.7) return "img_msg_good";
         return "img_msg_thanks";
     };
 
