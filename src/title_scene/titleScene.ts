@@ -43,9 +43,8 @@ export class TitleScene extends g.Scene {
         const blackout = new Blackout(this, this);
         blackout.x = g.game.width;
 
-        const wait = 500;
         this.timeline.create(blackout)
-            .wait(wait)
+            .wait(Blackout.DURATION_TRANSITION)
             .moveX(0, Blackout.DURATION_TRANSITION)
             .call(() => this._onFinish(this.isClicked));
     };
