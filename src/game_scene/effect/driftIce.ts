@@ -13,7 +13,6 @@ export class DriftIces extends g.E {
         for (let i = 0; i < maxCount; i++) {
             this.driftIces.push(new DriftIce(scene, asset, this));
         }
-
         this.speed = asset.width / g.game.fps * 1.05;
         this.onUpdate.add(this.updateHandler);
     }
@@ -33,7 +32,7 @@ export class DriftIces extends g.E {
             const driftIce = this.driftIces[i];
             for (let j = i + 1; j < this.maxCount; j++) {
                 const target = this.driftIces[j];
-                if (Collision.within(driftIce, target)) {
+                if (Collision.withinArea(driftIce, target, 0.95, 0.6)) {
                     const temp = target.vx;
                     target.vx = driftIce.vx * .98;
                     driftIce.vx = temp * .98;
@@ -53,8 +52,17 @@ export class DriftIces extends g.E {
         driftIce.x = g.game.random.generate() * g.game.width + g.game.width + driftIce.getWidth() / 2;
         driftIce.y = g.game.height - seaHeight + rate * driftIce.getHeight();
 
-        if (this.driftIces.filter(ice => ice !== driftIce && Collision.within(driftIce, ice)).length >= 1) {
+        if (this.driftIces.filter(ice => ice !== driftIce && Collision.withinArea(driftIce, ice)).length >= 1) {
             this.initPos(driftIce);
+        }
+
+        if (driftIce.children && driftIce.children.length > 0) {
+            const penguin = driftIce.children[0];
+            if (g.game.random.generate() < .2) {
+                penguin.show();
+            } else {
+                penguin.hide();
+            }
         }
         driftIce.modified();
     };
