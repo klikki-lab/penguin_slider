@@ -91,7 +91,7 @@ export class StageLayer extends g.E {
 
                     // if (this.wallDuration === 0 && levelRate > 0 && levelRate < 1) {
                     //     if (this.random.generate() < 1) {
-                    if (this.wallDuration === 0 && levelRate > 0.7 && levelRate < 0.9) { // 42s ～ 54s
+                    if (this.wallDuration === 0 && levelRate > 0.6 && levelRate < 0.9) { // 36s ～ 54s
                         if (this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 4)) {
                             this.bonusDuration = Math.floor(this.random.generate() * perSec + perSec * 2);
                             this.startBonusStep = this.step;
