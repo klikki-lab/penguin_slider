@@ -229,7 +229,7 @@ export class GameScene extends g.Scene {
     };
 
     private initGame = (): void => {
-        this.moveCamera(0);
+        this.translateCamera(0);
         this.speedController.init();
         this.speedometer.init();
         this.penguin.init();
@@ -319,20 +319,21 @@ export class GameScene extends g.Scene {
         return bubble;
     };
 
-    private createSpeechBubbleTimeline = (bubble: g.E, duration: number): tl.Tween =>
-        this.timeline.create(bubble)
-            .wait(duration * 3)
-            .fadeIn(duration, tl.Easing.easeOutQuint)
-            .wait(duration * 8)
-            .call(() => {
-                bubble.destroy();
+    private createSpeechBubbleTimeline = (bubble: g.E, duration: number): tl.Tween => this.timeline.create(bubble)
+        .wait(duration * 3)
+        .fadeIn(duration, tl.Easing.easeOutQuint)
+        .wait(duration * 8)
+        .call(() => {
+            bubble.destroy();
+            this.runAwayPenguin();
 
-                const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
-                const elapsedSec = Math.floor(g.game.age / g.game.fps) + 2;
-                const duration = (totalTimeLimit - elapsedSec) * 1000;
-                this.audioController.fadeOut(Music.BGM, duration);
-                this.runAwayPenguin();
-            });
+            // 残り時間からBGMのフェイドアウトの時間を決める
+            const marginSec = 2; // 念のために2秒の余裕を設けておく
+            const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
+            const elapsedSec = Math.floor(g.game.age / g.game.fps);
+            const duration = (totalTimeLimit - elapsedSec - marginSec) * 1000;
+            this.audioController.fadeOut(Music.BGM, duration);
+        });
 
     private calcResultMessage = () => {
         const collectRate = this.penguin.collectedSnowFlake / (this.stageLayer.snowFlakeCount + 1);
@@ -424,7 +425,7 @@ export class GameScene extends g.Scene {
         this.updateIceCubes(velocity, speedRate);
 
         if (this.camera.x < this.penguin.offsetX()) {
-            this.moveCamera(this.penguin.offsetX());
+            this.translateCamera(this.penguin.offsetX());
         }
     };
 
@@ -437,17 +438,14 @@ export class GameScene extends g.Scene {
         }
     };
 
-    private moveCamera = (cameraX: number): void => {
-        this.camera.x = cameraX;
+    private translateCamera = (x: number): void => {
+        this.camera.x = x;
 
-        this.backgroundLayer.x = cameraX;
+        this.backgroundLayer.x = x;
         this.backgroundLayer.modified();
 
-        this.hudLayer.x = cameraX;
+        this.hudLayer.x = x;
         this.hudLayer.modified();
-
-        // this.driftIces.x = cameraX;
-        // this.driftIces.modified();
     };
 
     private updatePenguin = (velocity: g.CommonOffset, speedRate: number): void => {
