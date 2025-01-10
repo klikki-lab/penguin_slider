@@ -123,14 +123,14 @@ export class TitleScene extends g.Scene {
         this.penguin.modified();
         if (this.penguin.x > g.game.width + this.penguin.getWidth() * 2) {
             this.finishScene();
-        } else if (!this.bubble && this.penguin.x + this.penguin.width * 1.5 > g.game.width) {
+        } else if (!this.isClickedStartButton && !this.bubble && this.penguin.x + this.penguin.width * 1.5 > g.game.width) {
             const isUp = this.penguin.y > Penguin.SIZE * 2;
             this.bubble = new SpeechBubble(this, isUp, "img_msg_here_we_go");
             this.bubble.x = this.penguin.x - this.penguin.width;
             this.bubble.y = isUp ? this.penguin.y - this.bubble.height : this.penguin.y + this.bubble.height;
             this.append(this.bubble);
 
-            if (this.startButton.visible)
+            if (this.startButton.visible())
                 this.startButton.hide();
         } else if (this.bubble) {
             this.bubble.x = Math.min(this.penguin.x - this.penguin.width, g.game.width - this.bubble.width * .6);
