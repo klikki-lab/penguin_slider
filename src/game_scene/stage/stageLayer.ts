@@ -205,6 +205,7 @@ export class StageLayer extends g.E {
 
     /**
      * @param src データのソース
+     * @param prevSpaceCount 前回の最上階以下の通路数（通過したかもしれないアイスキューブ数）
      * @returns 壁データと最上階の床の位置
      */
     private fixWallData = (src: number, prevSpaceCount: number): { data: number, topFloor: number } => {
