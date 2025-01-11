@@ -73,8 +73,6 @@ export class StageLayer extends g.E {
     needNextWall = (cameraX: number): boolean =>
         Math.floor(cameraX / Entity.SIZE) + StageLayer.COL + 1 > this.step;
 
-    createFloor = (): void => this.appendSnowCovered(this.appendWall(this.step++, StageLayer.ROW - 1, 0));
-
     /**
      * @param levelRate 0 から 1 までの値
      * @param speedRate 0 から 1 までの値
