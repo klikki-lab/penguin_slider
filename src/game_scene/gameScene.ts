@@ -25,11 +25,11 @@ import { SnowFlake } from "./stage/snowFlake";
 import { StageLayer } from "./stage/stageLayer";
 import { Wall } from "./stage/wall";
 
-const Music = {
+const MusicId = {
     BGM: "bgm_nc366054",
 } as const;
 
-const Sounds = {
+const SoundId = {
     SPAWN_ICE_CUBE: "se_spawn_ice_cube",
     OBTAIN: "se_obtain",
     SPLASH: "se_splash",
@@ -84,7 +84,7 @@ export class GameScene extends g.Scene {
                 "img_blackout", "img_start", "img_finish", "img_snow", "img_pause_message",
                 "img_speech_bubble", "img_msg_superb", "img_msg_excellent", "img_msg_nice", "img_msg_good", "img_msg_thanks",
                 "img_font", "font_glyphs",
-                "se_splash", "se_spawn_ice_cube", "se_obtain", "se_crush", "se_hitting_head", Music.BGM,
+                "se_splash", "se_spawn_ice_cube", "se_obtain", "se_crush", "se_hitting_head", MusicId.BGM,
             ],
         });
 
@@ -97,14 +97,14 @@ export class GameScene extends g.Scene {
 
         this.audioController = new AudioController(0.2, 0.1);
         const sounds = [
-            { assetId: Sounds.SPLASH },
-            { assetId: Sounds.SPAWN_ICE_CUBE },
-            { assetId: Sounds.OBTAIN },
-            { assetId: Sounds.CRUSH },
-            { assetId: Sounds.HITTING_HEAD },
+            { assetId: SoundId.SPLASH },
+            { assetId: SoundId.SPAWN_ICE_CUBE },
+            { assetId: SoundId.OBTAIN },
+            { assetId: SoundId.CRUSH },
+            { assetId: SoundId.HITTING_HEAD },
         ];
         this.audioController.addSE(this.asset, sounds);
-        this.audioController.addMusic(this.asset, [{ assetId: Music.BGM }]);
+        this.audioController.addMusic(this.asset, [{ assetId: MusicId.BGM }]);
 
         this.camera = new g.Camera2D({});
         g.game.focusingCamera = this.camera;
@@ -155,7 +155,7 @@ export class GameScene extends g.Scene {
 
     private spawnIceCubeIfNoObstacles = (): void => {
         if (!this.collideWall(this.penguin, { x: 0, y: -this.penguin.height }) && !(this.penguin.y - this.penguin.height < 0)) {
-            this.audioController.playSE(Sounds.SPAWN_ICE_CUBE);
+            this.audioController.playSE(SoundId.SPAWN_ICE_CUBE);
 
             const bottom = this.collideBottom(this.penguin, this.penguin.height);
             const y = bottom ? bottom.y - bottom.height / 2 - 1 : this.penguin.y + this.penguin.height / 2 - 1;
@@ -169,7 +169,7 @@ export class GameScene extends g.Scene {
             this.penguin.modified();
         } else {
             if (!this.hitTween || this.hitTween.isFinished()) {
-                this.audioController.playSE(Sounds.HITTING_HEAD);
+                this.audioController.playSE(SoundId.HITTING_HEAD);
                 this.hitTween = this.timeline.create(this.penguin)
                     .scaleTo(Penguin.DEFAULT_SCALE * 1.2, Penguin.DEFAULT_SCALE * 0.9, 50)
                     .scaleTo(Penguin.DEFAULT_SCALE, Penguin.DEFAULT_SCALE, 50);
@@ -216,7 +216,7 @@ export class GameScene extends g.Scene {
             .fadeIn(duration, tl.Easing.easeOutQuint)
             .wait(wait)
             .con()
-            .call(() => this.audioController.playMusic(Music.BGM))
+            .call(() => this.audioController.playMusic(MusicId.BGM))
             .moveX(-start.width / 2, duration, tl.Easing.easeInQuint)
             .con()
             .fadeOut(duration, tl.Easing.easeInQuint)
@@ -332,7 +332,7 @@ export class GameScene extends g.Scene {
             const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
             const elapsedSec = Math.floor(g.game.age / g.game.fps);
             const duration = (totalTimeLimit - elapsedSec - marginSec) * 1000;
-            this.audioController.fadeOut(Music.BGM, duration);
+            this.audioController.fadeOut(MusicId.BGM, duration);
         });
 
     private calcResultMessage = () => {
@@ -483,7 +483,7 @@ export class GameScene extends g.Scene {
 
                         if (Collision.intersect(this.penguin, { x: 0, y: 0 }, snowflake)) {
                             if (snowflake instanceof SnowFlake && !snowflake.isObtained) {
-                                this.audioController.playSE(Sounds.OBTAIN);
+                                this.audioController.playSE(SoundId.OBTAIN);
                                 snowflake.obtain();
                                 this.penguin.obtainSnowFlake();
                                 this.scoreLabel.addScore(snowflake.score);
@@ -518,7 +518,7 @@ export class GameScene extends g.Scene {
                     if (Math.abs(this.penguin.velocity.y) < this.penguin.height * .1) {
                         this.penguin.velocity.y = 0;
                     } else {
-                        this.audioController.playSE(Sounds.CRUSH);
+                        this.audioController.playSE(SoundId.CRUSH);
                         this.penguin.velocity.x *= 0.9;
                         this.penguin.velocity.y *= -0.75;
                         this.penguin.angle *= 0.9;
@@ -647,7 +647,7 @@ export class GameScene extends g.Scene {
         this.holdRepeater.init(false);
 
         if (this.isClicked) {
-            this.audioController.playSE(Sounds.CRUSH);
+            this.audioController.playSE(SoundId.CRUSH);
         }
         this.penguin.crushed(speedRate);
         this.penguin.x = wall.x - wall.width / 2 - this.penguin.width / 2;
@@ -669,7 +669,7 @@ export class GameScene extends g.Scene {
 
     private appendSplash = (x: number): void => {
         if (this.isClicked && x > this.camera.x && x < this.camera.x + g.game.width) {
-            this.audioController.playSE(Sounds.SPLASH);
+            this.audioController.playSE(SoundId.SPLASH);
         }
         new Splash(this, this.effectBackLayer, x);
     };
