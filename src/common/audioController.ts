@@ -1,6 +1,6 @@
 interface Musics {
     [key: string]: {
-        readonly audioAssetContext: g.AudioPlayContext;
+        readonly context: g.AudioPlayContext;
     }
 }
 
@@ -50,22 +50,22 @@ export class AudioController {
                 volume: this.musicVolume * g.Util.clamp(param.volumeRate ?? 1, 0, 1),
             })
             this.musics[param.assetId] = {
-                audioAssetContext: audioPlayContext,
+                context: audioPlayContext,
             };
         });
     };
 
     playMusic = (assetId: string): g.AudioPlayContext => {
         const music = this.musics[assetId];
-        const context = music.audioAssetContext;
+        const context = music.context;
         context.play();
         return context;
     };
 
-    stopMusic = (assetId: string): void => this.musics[assetId].audioAssetContext.stop();
+    stopMusic = (assetId: string): void => this.musics[assetId].context.stop();
 
     fadeOut = (assetId: string, duration: number): g.AudioTransitionContext =>
-        g.AudioUtil.fadeOut(g.game, this.musics[assetId].audioAssetContext, duration);
+        g.AudioUtil.fadeOut(g.game, this.musics[assetId].context, duration);
 
 
     addSE = (asset: g.AssetAccessor, params: SoundParams[]): void => {
