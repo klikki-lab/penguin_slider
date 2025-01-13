@@ -67,7 +67,6 @@ export class GameScene extends g.Scene {
     private holdRepeater: MouseButtonHoldRepeater;
     private pauseMessage: g.Sprite;
     private blackout: g.Sprite;
-    private context: g.AudioPlayContext;
     private isPauseGame = false;
 
     constructor(private param: GameMainParameterObject, private isClicked: boolean, private timeLimit: number) {
