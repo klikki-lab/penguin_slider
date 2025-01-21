@@ -483,6 +483,11 @@
 			"type": "script",
 			"path": "script/_bootstrap.js",
 			"global": true
+		},
+		"snowflakeStorage": {
+			"type": "script",
+			"path": "script/game_scene/hud/snowflakeStorage.js",
+			"global": true
 		}
 	},
 	"moduleMainScripts": {
