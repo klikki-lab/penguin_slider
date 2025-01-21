@@ -19,6 +19,7 @@ export class StageLayer extends g.E {
     private static readonly PITFALL_MASK = 0x1FC;
     private static readonly LEVEL_MIN_OFFSETS = [0, 0x2F, 0x3F, 0x4F, 0x5F, 0x6F, 0x7F];
 
+    private _onFinishBonusTime: () => void;
     private _snowflakes: g.E;
     private _snowFlakeCount = 0;
     private step = 0;
@@ -29,6 +30,7 @@ export class StageLayer extends g.E {
     private prevSpaceCount = 0;
     private bonusDuration = 0;
     private startBonusStep = 0;
+    private endBonusStep = 0;
     private bonusTimes = 0;
     private isEnd = false;
     private endStep = 0;
@@ -74,12 +76,13 @@ export class StageLayer extends g.E {
         Math.floor(cameraX / Entity.SIZE) + StageLayer.COL + 1 > this.step;
 
     /**
-     * @param levelRate 0 から 1 までの値
-     * @param speedRate 0 から 1 までの値
+     * @param levelRate     0 から 1 までの値
+     * @param speedRate     0 から 1 までの値
      * @param remainingTime 残り時間
-     * @param perSec 秒速
+     * @param perSec        秒速
+     * @param storageRate   雪の結晶が貯まった比率
      */
-    create = (levelRate: number, speedRate: number, remainingTime: number, perSec: number): void => {
+    create = (levelRate: number, speedRate: number, remainingTime: number, perSec: number, storageRate: number): void => {
         if (!this.isEnd) {
             if (this.interval <= 0 && levelRate < 1) {
                 this.createNextWallData(levelRate, speedRate, remainingTime, perSec);
@@ -87,14 +90,20 @@ export class StageLayer extends g.E {
                 if (this.wallDuration > 0) {
                     this.wallDuration--;
 
-                    // if (this.wallDuration === 0 && levelRate > 0 && levelRate < 1) {
-                    //     if (this.random.generate() < 1) {
-                    if (this.wallDuration === 0 && levelRate > 0.6 && levelRate < 0.9) { // 36s ～ 54s
-                        if (this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 4)) {
-                            this.bonusDuration = Math.floor(this.random.generate() * perSec + perSec * 2);
-                            this.startBonusStep = this.step;
-                            this.bonusTimes++;
-                        }
+                    // if (this.wallDuration === 0 && levelRate > 0.6 && levelRate < 0.9) { // 36s ～ 54s
+                    //     const increaseSpeedRate = (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 4);
+                    //     //const increaseObtainRate = rareCount / this.snowflakeCount * .25; 
+                    //     if (this.random.generate() < increaseSpeedRate) {
+                    //         this.bonusDuration = Math.floor(this.random.generate() * perSec + perSec * 2);
+                    //         this.startBonusStep = this.step;
+                    //         this.bonusTimes++;
+                    //     }
+                    // }
+                    if (this.wallDuration === 0 && storageRate >= 1 && this.step - this.endBonusStep > StageLayer.COL) {
+                        this.bonusDuration = Math.floor(this.random.generate() * perSec + perSec * 2);
+                        this.startBonusStep = this.step;
+                        this.endBonusStep = this.step + this.bonusDuration;
+                        this.bonusTimes++;
                     }
                 } else {
                     if (levelRate < 1 && this.bonusDuration <= 0) {
@@ -160,6 +169,18 @@ export class StageLayer extends g.E {
             const bottom = this.appendWall(this.step, StageLayer.ROW - 1, 0);
             this.appendSnowCovered(bottom);
         }
+
+        const penguinOffsetX = 3;
+        const start = this.startBonusStep + StageLayer.COL - penguinOffsetX;
+        if (this.startBonusStep && this.endBonusStep && this.step >= start) {
+            const end = this.endBonusStep + StageLayer.COL - penguinOffsetX;
+            if (this.step >= end) {
+                this.startBonusStep = 0;
+                this.endBonusStep = 0;
+                this._onFinishBonusTime();
+            }
+        }
+
         this.step++;
     };
 
@@ -287,5 +308,7 @@ export class StageLayer extends g.E {
 
     get snowflakes(): g.E[] { return this._snowflakes.children; }
 
-    get snowFlakeCount(): number { return this._snowFlakeCount; }
+    get snowflakeCount(): number { return this._snowFlakeCount; }
+
+    set onFinishBonusTime(callback: () => void) { this._onFinishBonusTime = callback; }
 }

@@ -24,6 +24,7 @@ import { SpeedController } from "./speedController";
 import { SnowFlake } from "./stage/snowFlake";
 import { StageLayer } from "./stage/stageLayer";
 import { Wall } from "./stage/wall";
+import { SnowflakeStorage } from "./hud/snowflakeStorage";
 
 const MusicId = {
     BGM: "bgm_nc366054",
@@ -62,6 +63,7 @@ export class GameScene extends g.Scene {
     private scoreLabel: ScoreLabel;
     private timeLabel: TimeLabel;
     private speedometer: Speedometer;
+    private snowflakeStorage: SnowflakeStorage;
     private bitmapFont: g.BitmapFont;
     private audioController: AudioController;
     private holdRepeater: MouseButtonHoldRepeater;
@@ -122,6 +124,9 @@ export class GameScene extends g.Scene {
         this.effectBackLayer.children = [];
 
         this.stageLayer = new StageLayer(this, this.param.random);
+        this.stageLayer.onFinishBonusTime = () => {
+            this.snowflakeStorage.release();
+        };
         this.append(this.stageLayer);
 
         this.iceCubes = new g.E({ scene: this, parent: this });
@@ -233,6 +238,7 @@ export class GameScene extends g.Scene {
         this.speedometer.init();
         this.penguin.init();
         this.stageLayer.init();
+        this.snowflakeStorage.init();
         this.clouds.init();
         this.driftIces.init();
         this.holdRepeater.init(false);
@@ -253,6 +259,9 @@ export class GameScene extends g.Scene {
     private finishGame = (): void => {
         if (this.blackout) return;
 
+        if (this.snowflakeStorage.isRelease) {
+            this.snowflakeStorage.release();
+        }
         this.stageLayer.finish();
         const duration = 500;
         if (!this.speechBubbleTween) {
@@ -335,7 +344,7 @@ export class GameScene extends g.Scene {
         });
 
     private calcResultMessage = () => {
-        const collectRate = this.penguin.collectedSnowFlake / (this.stageLayer.snowFlakeCount + 1);
+        const collectRate = this.penguin.collectedSnowFlake / (this.stageLayer.snowflakeCount + 1);
         // console.log(`missCount: ${this.penguin.missCount}` +
         //     ` ,collectRate: ${collectRate}` +
         //     ` ,collected: ${this.penguin.collectedSnowFlake}` +
@@ -434,7 +443,8 @@ export class GameScene extends g.Scene {
             const remainingTime = this.countdownTimer.remainingTime;
             const levelRate = 1 - remainingTime / this.timeLimit;
             const perSec = this.speedController.getPerSec();
-            this.stageLayer.create(levelRate, speedRate, remainingTime, perSec);
+            const ratio = this.snowflakeStorage.ratio();
+            this.stageLayer.create(levelRate, speedRate, remainingTime, perSec, ratio);
         }
     };
 
@@ -484,7 +494,12 @@ export class GameScene extends g.Scene {
                             if (snowflake instanceof SnowFlake && !snowflake.isObtained) {
                                 this.audioController.playSE(SoundId.OBTAIN);
                                 snowflake.obtain();
+
                                 this.penguin.obtainSnowFlake();
+                                if (snowflake.score !== 200) {
+                                    const count = Math.floor(snowflake.score / 100);
+                                    this.snowflakeStorage.add(count);
+                                }
                                 this.scoreLabel.addScore(snowflake.score);
                                 new SplashFragments(this, this.effectMiddleLayer, snowflake);
 
@@ -492,6 +507,11 @@ export class GameScene extends g.Scene {
                                 popupScore.x = this.scoreLabel.x + this.scoreLabel.width - popupScore.width;
                                 popupScore.y = this.scoreLabel.y + this.scoreLabel.height;
                                 this.hudLayer.append(popupScore);
+
+                                // const popupCount = new PopupScore(this, this.bitmapFont, count);
+                                // popupCount.x = this.snowflakeStorage.x + this.snowflakeStorage.width - popupCount.width;
+                                // popupCount.y = this.snowflakeStorage.y + this.snowflakeStorage.height / 2;
+                                // this.hudLayer.append(popupCount);
                                 break;
                             }
                         }
@@ -741,17 +761,22 @@ export class GameScene extends g.Scene {
         this.scoreLabel.x = fontSize / 2;
         this.scoreLabel.y = fontSize / 2;
 
+        this.snowflakeStorage = new SnowflakeStorage(this);
+        this.snowflakeStorage.x = this.scoreLabel.x + this.scoreLabel.width + this.snowflakeStorage.width * 1.25;
+        this.snowflakeStorage.y = this.scoreLabel.y + this.scoreLabel.height / 2;
+
+        this.speedometer = new Speedometer(this);
+        this.speedometer.x = this.snowflakeStorage.x + this.snowflakeStorage.width + this.speedometer.width * .75;
+        this.speedometer.y = this.speedometer.height / 2;
+
         this.timeLabel = new TimeLabel(this, this.bitmapFont, fontSize, this.timeLimit);
         this.timeLabel.x = g.game.width - this.timeLabel.width - fontSize / 2;
         this.timeLabel.y = fontSize / 2;
 
-        this.speedometer = new Speedometer(this);
-        this.speedometer.x = g.game.width / 2;
-        this.speedometer.y = this.speedometer.height / 2;
-
         layer.append(this.scoreLabel);
         layer.append(this.timeLabel);
         layer.append(this.speedometer);
+        layer.append(this.snowflakeStorage);
         return layer;
     };
 
