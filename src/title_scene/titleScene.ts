@@ -12,7 +12,7 @@ import { Wall } from "../game_scene/stage/wall";
 
 export class TitleScene extends g.Scene {
 
-    private _onFinish: (isClicked: boolean) => void;
+    private _onFinish: (isClicked: boolean, isEasyMode: boolean) => void;
     private timeline: tl.Timeline;
     private tween: tl.Tween;
     private smokeLayer: g.E;
@@ -21,9 +21,11 @@ export class TitleScene extends g.Scene {
     private iceCubes: g.E;
     private bubble: SpeechBubble;
     private startButton: Button;
+    private startEasyModeButton: Button;
     private holdRepeater: MouseButtonHoldRepeater;
     private isClicked = false;
     private isClickedStartButton = false;
+    private isClickedStartEasyModeButton = false;
 
     constructor(private timeLimit: number) {
         super({
@@ -32,7 +34,7 @@ export class TitleScene extends g.Scene {
                 "img_blackout", "img_background",
                 "img_title_logo", "img_how_to_play", "img_speech_bubble", "img_msg_here_we_go",
                 "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_ice_cube", "img_smoke",
-                "img_wall", "img_snow_covered_01", "img_snow_covered_02", "img_start_button",
+                "img_wall", "img_snow_covered_01", "img_snow_covered_02", "img_start_button", "img_easy_mode_button",
             ],
         });
 
@@ -46,7 +48,7 @@ export class TitleScene extends g.Scene {
         this.timeline.create(blackout)
             .wait(Blackout.DURATION_TRANSITION)
             .moveX(0, Blackout.DURATION_TRANSITION)
-            .call(() => this._onFinish(this.isClicked));
+            .call(() => this._onFinish(this.isClicked, this.isClickedStartEasyModeButton));
     };
 
     private loadHandler = (): void => {
@@ -123,7 +125,8 @@ export class TitleScene extends g.Scene {
         this.penguin.modified();
         if (this.penguin.x > g.game.width + this.penguin.getWidth() * 2) {
             this.finishScene();
-        } else if (!this.isClickedStartButton && !this.bubble && this.penguin.x + this.penguin.width * 1.5 > g.game.width) {
+        } else if (!this.isClickedStartButton && !this.isClickedStartEasyModeButton && !this.bubble &&
+            this.penguin.x + this.penguin.width * 1.5 > g.game.width) {
             const isUp = this.penguin.y > Penguin.SIZE * 2;
             this.bubble = new SpeechBubble(this, isUp, "img_msg_here_we_go");
             this.bubble.x = this.penguin.x - this.penguin.width;
@@ -152,7 +155,7 @@ export class TitleScene extends g.Scene {
             this.spawnIceCube();
         }
 
-        if (this.isClickedStartButton) {
+        if (this.isClickedStartButton || this.isClickedStartEasyModeButton) {
             this.penguin.velocity.x *= 1.1;
         }
     };
@@ -178,10 +181,8 @@ export class TitleScene extends g.Scene {
         button.moveTo(g.game.width / 2 + button.width, buttonY);
         button.opacity = 0;
         button.onClick = btn => {
-            if (!this.isClickedStartButton) {
-                this.isClickedStartButton = true;
-                btn.hide();
-            }
+            this.isClickedStartButton = true;
+            btn.hide();
         };
 
         button.onUpdate.add(() => {
@@ -189,6 +190,20 @@ export class TitleScene extends g.Scene {
             button.modified();
         });
         layer.append(this.startButton = button);
+
+        this.startEasyModeButton = new Button(this, "img_easy_mode_button");
+        this.startEasyModeButton.moveTo(g.game.width / 2 - this.startEasyModeButton.width * 2, buttonY);
+        this.startEasyModeButton.opacity = 0;
+        this.startEasyModeButton.onClick = btn => {
+            this.isClickedStartEasyModeButton = true;
+            btn.hide();
+        };
+        this.startEasyModeButton.onUpdate.add(() => {
+            this.startEasyModeButton.y = buttonY + Math.sin(g.game.age / (g.game.fps * 2) * Math.PI) * margin * .5;
+            this.startEasyModeButton.modified();
+        });
+        layer.append(this.startEasyModeButton);
+
 
         const duration = 500;
         this.timeline.create(logo)
@@ -200,6 +215,9 @@ export class TitleScene extends g.Scene {
             .fadeIn(duration, tl.Easing.easeInOutCubic);
 
         this.timeline.create(button)
+            .fadeIn(duration, tl.Easing.easeInOutCubic);
+
+        this.timeline.create(this.startEasyModeButton)
             .fadeIn(duration, tl.Easing.easeInOutCubic);
 
         return layer;
@@ -234,5 +252,5 @@ export class TitleScene extends g.Scene {
         });
     }
 
-    set onFinish(callback: (isClicked: boolean) => void) { this._onFinish = callback }
+    set onFinish(callback: (isClicked: boolean, isEasyMode: boolean) => void) { this._onFinish = callback }
 }

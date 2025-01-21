@@ -488,6 +488,12 @@
 			"type": "script",
 			"path": "script/game_scene/stage/snowflake.js",
 			"global": true
+		},
+		"img_easy_mode_button": {
+			"type": "image",
+			"path": "image/img_easy_mode_button.png",
+			"width": 524,
+			"height": 100
 		}
 	},
 	"moduleMainScripts": {

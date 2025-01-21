@@ -71,7 +71,7 @@ export class GameScene extends g.Scene {
     private blackout: g.Sprite;
     private isPauseGame = false;
 
-    constructor(private param: GameMainParameterObject, private isClicked: boolean, private timeLimit: number) {
+    constructor(private param: GameMainParameterObject, private isClicked: boolean, private isEasyMode: boolean, private timeLimit: number) {
         super({
             game: g.game,
             assetIds: [
@@ -94,7 +94,7 @@ export class GameScene extends g.Scene {
 
     private loadHandler = (): void => {
         this.holdRepeater = new MouseButtonHoldRepeater();
-        this.speedController = new SpeedController();
+        this.speedController = new SpeedController(this.isEasyMode ? { limit: 0.2 } : {});
 
         this.audioController = new AudioController(0.2, 0.1);
         const sounds = [
@@ -757,7 +757,8 @@ export class GameScene extends g.Scene {
         this.curtainLayer = new g.E({ scene: this, parent: layer });
 
         const fontSize = 40;
-        this.scoreLabel = new ScoreLabel(this, this.bitmapFont, fontSize);
+        const initScore = this.isEasyMode ? 1 : 0;
+        this.scoreLabel = new ScoreLabel(this, this.bitmapFont, fontSize, initScore);
         this.scoreLabel.x = fontSize / 2;
         this.scoreLabel.y = fontSize / 2;
 

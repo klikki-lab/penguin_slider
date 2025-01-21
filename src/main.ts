@@ -14,8 +14,8 @@ export function main(param: GameMainParameterObject): void {
     g.game.loadingScene = new CustomLoadingScene();
 
     const titleScene = new TitleScene(7);
-    titleScene.onFinish = (isClicked: boolean): void => {
-        g.game.replaceScene(new GameScene(param, isClicked, 60));
+    titleScene.onFinish = (isClicked: boolean, isEasyMode: boolean): void => {
+        g.game.replaceScene(new GameScene(param, isClicked, isEasyMode, 60));
     };
     g.game.pushScene(titleScene);
 }
