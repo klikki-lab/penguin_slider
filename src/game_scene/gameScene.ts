@@ -285,18 +285,16 @@ export class GameScene extends g.Scene {
             });
             finish.x = g.game.width / 2;
             finish.y = g.game.height / 2 - finish.height * .2;
+            let step = 0;
+            finish.onUpdate.add(() => {
+                finish.y = g.game.height / 2 + Math.sin(step++ / g.game.fps * Math.PI) * finish.height * .05;
+                finish.modified();
+            });
 
             this.timeline.create(finish)
                 .moveY(g.game.height / 2, duration, tl.Easing.easeOutQuint)
                 .con()
-                .fadeIn(duration, tl.Easing.easeOutQuint)
-                .call(() => {
-                    let step = 0;
-                    finish.onUpdate.add(() => {
-                        finish.y = g.game.height / 2 + Math.sin(step++ / g.game.fps * Math.PI) * finish.height * .05;
-                        finish.modified();
-                    });
-                });
+                .fadeIn(duration, tl.Easing.easeOutQuint);
         } else {
             const bubbles = this.penguin.children.filter(e => e instanceof SpeechBubble);
             if (bubbles && bubbles.length > 0 && (bubbles[0] instanceof SpeechBubble)) {
