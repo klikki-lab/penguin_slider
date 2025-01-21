@@ -449,11 +449,6 @@
 			"path": "script/game_scene/speedController.js",
 			"global": true
 		},
-		"snowFlake": {
-			"type": "script",
-			"path": "script/game_scene/stage/snowFlake.js",
-			"global": true
-		},
 		"stageLayer": {
 			"type": "script",
 			"path": "script/game_scene/stage/stageLayer.js",
@@ -487,6 +482,11 @@
 		"snowflakeStorage": {
 			"type": "script",
 			"path": "script/game_scene/hud/snowflakeStorage.js",
+			"global": true
+		},
+		"snowflake": {
+			"type": "script",
+			"path": "script/game_scene/stage/snowflake.js",
 			"global": true
 		}
 	},

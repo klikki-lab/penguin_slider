@@ -1,4 +1,4 @@
-export class SnowFlake extends g.Sprite {
+export class Snowflake extends g.Sprite {
 
     private _isObtained = false;
 

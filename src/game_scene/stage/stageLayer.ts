@@ -1,5 +1,5 @@
 import { Entity } from "../entity/entity";
-import { SnowFlake } from "./snowFlake";
+import { Snowflake } from "./snowflake";
 import { Wall } from "./wall";
 
 export class StageLayer extends g.E {
@@ -301,7 +301,7 @@ export class StageLayer extends g.E {
     };
 
     private appendSnowFlake = (x: number, y: number, assetId: string, score: number): void => {
-        const snowFlake = new SnowFlake(this.scene, assetId, score);
+        const snowFlake = new Snowflake(this.scene, assetId, score);
         snowFlake.moveTo(x, y - Entity.SIZE / 2);
         this._snowflakes.append(snowFlake);
     };

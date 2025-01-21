@@ -21,7 +21,7 @@ import { ScoreLabel } from "./hud/scoreLabel";
 import { Speedometer } from "./hud/speedometer";
 import { TimeLabel } from "./hud/timeLabel";
 import { SpeedController } from "./speedController";
-import { SnowFlake } from "./stage/snowFlake";
+import { Snowflake } from "./stage/snowflake";
 import { StageLayer } from "./stage/stageLayer";
 import { Wall } from "./stage/wall";
 import { SnowflakeStorage } from "./hud/snowflakeStorage";
@@ -491,7 +491,7 @@ export class GameScene extends g.Scene {
                         if (Math.abs(this.penguin.x - snowflake.x) > this.penguin.width) continue;
 
                         if (Collision.intersect(this.penguin, { x: 0, y: 0 }, snowflake)) {
-                            if (snowflake instanceof SnowFlake && !snowflake.isObtained) {
+                            if (snowflake instanceof Snowflake && !snowflake.isObtained) {
                                 this.audioController.playSE(SoundId.OBTAIN);
                                 snowflake.obtain();
 
