@@ -123,6 +123,7 @@ export class TitleScene extends g.Scene {
     private updateHandler = (): void | boolean => {
         this.penguin.x += this.penguin.velocity.x;
         this.penguin.modified();
+
         if (this.penguin.x > g.game.width + this.penguin.getWidth() * 2) {
             this.finishScene();
         } else if (!this.isClickedStartButton && !this.isClickedStartEasyModeButton && !this.bubble &&
@@ -133,8 +134,13 @@ export class TitleScene extends g.Scene {
             this.bubble.y = isUp ? this.penguin.y - this.bubble.height : this.penguin.y + this.bubble.height;
             this.append(this.bubble);
 
-            if (this.startButton.visible())
+            if (this.startButton.visible()) {
                 this.startButton.hide();
+            }
+
+            if (this.startEasyModeButton.visible()) {
+                this.startEasyModeButton.hide();
+            }
         } else if (this.bubble) {
             this.bubble.x = Math.min(this.penguin.x - this.penguin.width, g.game.width - this.bubble.width * .6);
             this.bubble.modified();
@@ -145,7 +151,7 @@ export class TitleScene extends g.Scene {
             iceCube.modified();
         });
 
-        if (g.game.age % Math.floor(g.game.fps / 30 * 8) === 0) {
+        if (g.game.age % Math.floor(g.game.fps / Math.min(this.penguin.velocity.x, g.game.fps) * 2) === 0) {
             const y = (StageLayer.ROW - 2) * this.penguin.height + this.penguin.height;
             const pos = { x: this.penguin.x - this.penguin.width / 2, y: y };
             this.smokeLayer.append(new SnowSmoke(this, pos));
@@ -183,6 +189,7 @@ export class TitleScene extends g.Scene {
         button.onClick = btn => {
             this.isClickedStartButton = true;
             btn.hide();
+            this.startEasyModeButton.hide();
         };
 
         button.onUpdate.add(() => {
@@ -197,6 +204,7 @@ export class TitleScene extends g.Scene {
         this.startEasyModeButton.onClick = btn => {
             this.isClickedStartEasyModeButton = true;
             btn.hide();
+            this.startButton.hide();
         };
         this.startEasyModeButton.onUpdate.add(() => {
             this.startEasyModeButton.y = buttonY + Math.sin(g.game.age / (g.game.fps * 2) * Math.PI) * margin * .5;

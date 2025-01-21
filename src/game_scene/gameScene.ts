@@ -393,13 +393,15 @@ export class GameScene extends g.Scene {
                         this.createSnowSmoke(this.penguin, speedRate);
                     }
                 }
+            }
 
-                for (const iceCube of this.iceCubes.children) {
-                    if (!(iceCube instanceof IceCube) || !iceCube) continue;
+            for (const iceCube of this.iceCubes.children) {
+                if (!(iceCube instanceof IceCube) || !iceCube) continue;
+                let needSnowSmoke = false;
+                for (let i = 0; i < velocity.x; i++) {
                     if (iceCube.x - iceCube.getWidth() / 2 < this.camera.x + g.game.width) {
                         iceCube.x += 1;
                         iceCube.modified();
-
                         if (!needSnowSmoke && (this.collideBottom(iceCube, 1) instanceof Wall)) {
                             needSnowSmoke = true;
                             this.createSnowSmoke(iceCube, speedRate);
