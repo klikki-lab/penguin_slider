@@ -90,15 +90,6 @@ export class StageLayer extends g.E {
                 if (this.wallDuration > 0) {
                     this.wallDuration--;
 
-                    // if (this.wallDuration === 0 && levelRate > 0.6 && levelRate < 0.9) { // 36s ～ 54s
-                    //     const increaseSpeedRate = (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 4);
-                    //     //const increaseObtainRate = rareCount / this.snowflakeCount * .25; 
-                    //     if (this.random.generate() < increaseSpeedRate) {
-                    //         this.bonusDuration = Math.floor(this.random.generate() * perSec + perSec * 2);
-                    //         this.startBonusStep = this.step;
-                    //         this.bonusTimes++;
-                    //     }
-                    // }
                     if (this.wallDuration === 0 && storageRate >= 1 && this.step - this.endBonusStep > StageLayer.COL) {
                         this.bonusDuration = Math.floor(this.random.generate() * perSec + perSec * 2);
                         this.startBonusStep = this.step;
