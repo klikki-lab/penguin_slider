@@ -27,7 +27,7 @@ export class StageLayer extends g.E {
     private wallDuration = 0;
     private wall = 0;
     private startWall = -1;
-    private prevSpaceCount = 0;
+    private possibleMaxIceCube = 0;
     private bonusDuration = 0;
     private startBonusStep = 0;
     private endBonusStep = 0;
@@ -57,7 +57,7 @@ export class StageLayer extends g.E {
         this.wallDuration = 0;
         this.wall = 0;
         this.startWall == -1;
-        this.prevSpaceCount = 0;
+        this.possibleMaxIceCube = 0;
         this.bonusDuration = 0;
 
         for (this.step = -1; this.step < StageLayer.COL; this.step++) {
@@ -75,6 +75,13 @@ export class StageLayer extends g.E {
     needNextWall = (cameraX: number): boolean =>
         Math.floor(cameraX / Entity.SIZE) + StageLayer.COL + 1 > this.step;
 
+    private startBonusArea = (perSec: number): void => {
+        this.bonusDuration = Math.floor(this.random.generate() * perSec + perSec * 2);
+        this.startBonusStep = this.step;
+        this.endBonusStep = this.step + this.bonusDuration;
+        this.bonusTimes++;
+    };
+
     /**
      * @param levelRate     0 から 1 までの値
      * @param speedRate     0 から 1 までの値
@@ -90,11 +97,15 @@ export class StageLayer extends g.E {
                 if (this.wallDuration > 0) {
                     this.wallDuration--;
 
-                    if (this.wallDuration === 0 && storageRate >= 1 && this.step - this.endBonusStep > StageLayer.COL) {
-                        this.bonusDuration = Math.floor(this.random.generate() * perSec + perSec * 2);
-                        this.startBonusStep = this.step;
-                        this.endBonusStep = this.step + this.bonusDuration;
-                        this.bonusTimes++;
+                    if (this.wallDuration === 0 && this.step - this.endBonusStep > StageLayer.COL) {
+                        if (storageRate >= 1) {
+                            this.startBonusArea(perSec);
+                        } else {
+                            if (levelRate > 0.6 && levelRate < 0.9 && storageRate < .5 &&
+                                this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 4)) {
+                                this.startBonusArea(perSec);
+                            }
+                        }
                     }
                 } else {
                     if (levelRate < 1 && this.bonusDuration <= 0) {
@@ -129,7 +140,7 @@ export class StageLayer extends g.E {
                     if (height > 0) {
                         this.appendSnowCovered(wall);
                         if (height < StageLayer.ROW - 1) {
-                            const index = StageLayer.SNOWFLAKE_INDEX[snowflakeIndex++];
+                            const index = StageLayer.SNOWFLAKE_INDEX[Math.min(snowflakeIndex++, StageLayer.SNOWFLAKE_INDEX.length - 1)];
                             const assetId = StageLayer.SNOWFLAKE_ASSET_IDS[index];
                             const score = index * 200 + 100;
                             this.appendSnowFlake(wall.x, wall.y - wall.height / 2, assetId, score);
@@ -153,7 +164,7 @@ export class StageLayer extends g.E {
                 this._snowFlakeCount++;
             }
             if (this.bonusDuration === 0) {
-                this.prevSpaceCount = 0;
+                this.possibleMaxIceCube = 0;
             }
         } else {
             this.appendWall(this.step, 0, 0);
@@ -176,13 +187,6 @@ export class StageLayer extends g.E {
     };
 
     private createNextWallData = (levelRate: number, speedRate: number, remainingTime: number, perSec: number): void => {
-        for (let i = StageLayer.SNOWFLAKE_INDEX.length - 1; i >= 0; i--) {
-            const j = Math.floor(this.random.generate() * (i + 1));
-            const temp = StageLayer.SNOWFLAKE_INDEX[i];
-            StageLayer.SNOWFLAKE_INDEX[i] = StageLayer.SNOWFLAKE_INDEX[j];
-            StageLayer.SNOWFLAKE_INDEX[j] = temp;
-        }
-
         const penguinOffsetX = 3;
         const arrivalTime = (StageLayer.COL - penguinOffsetX) / perSec; // ペンギンが壁（右端）に到達する時間
         if (remainingTime <= arrivalTime) { // 今から壁を作ってもペンギンまで到達しない可能性が高い場合
@@ -201,9 +205,10 @@ export class StageLayer extends g.E {
 
         const level = Math.floor((StageLayer.LEVEL_MIN_OFFSETS.length - 1) * levelRate);
         const min = StageLayer.LEVEL_MIN_OFFSETS[level];
-        const wallData = this.fixWallData(min, this.prevSpaceCount);
+        const prevPssibleMaxIceCube = this.possibleMaxIceCube;
+        const wallData = this.fixWallData(min, prevPssibleMaxIceCube);
         this.wall = wallData.data;
-        this.prevSpaceCount = this.countSpace(wallData.data, wallData.topFloor);
+        this.possibleMaxIceCube = this.countSpace(wallData.data, wallData.topFloor);
 
         if (wallData.topFloor >= 3 && (this.wall & 0x3) === 0x1 && this.random.generate() < .3) {
             this.wall &= StageLayer.PITFALL_MASK;
@@ -211,14 +216,46 @@ export class StageLayer extends g.E {
 
         const interval = Math.floor(wallData.topFloor + perSec / 2 + this.random.generate() * (perSec / 2));
         this.interval = Math.max(StageLayer.MIN_INTERVAL, interval);
+
+        const floors = this.findFloor(wallData.data);
+        const passableFloors = floors.filter((floor => floor >= prevPssibleMaxIceCube));
+        //console.log(`存在するかもしれない氷最大数:${prevPssibleMaxIceCube}, フロア: ${floors}, 必ず通行可能な床: ${passableFloors}`);
+        for (let i = 0; i < StageLayer.SNOWFLAKE_INDEX.length; i++) {
+            StageLayer.SNOWFLAKE_INDEX[i] = i === 0 ? 1 : 0;
+        }
+        if (passableFloors.length <= 1) {
+            if (floors.length === 2) {
+                if (this.random.generate() < .5) {
+                    StageLayer.SNOWFLAKE_INDEX[0] = 0;
+                }
+            } else if (floors.length === 1) {
+                this.shuffleSnowflakes();
+            }
+        } else if (passableFloors.length === 3) {
+            this.shuffleSnowflakes();
+        } else {
+            if (this.random.generate() < .5) {
+                StageLayer.SNOWFLAKE_INDEX[0] = 0;
+                StageLayer.SNOWFLAKE_INDEX[1] = 1;
+            }
+        }
+    };
+
+    private shuffleSnowflakes = (): void => {
+        for (let i = StageLayer.SNOWFLAKE_INDEX.length - 1; i >= 0; i--) {
+            const j = Math.floor(this.random.generate() * (i + 1));
+            const temp = StageLayer.SNOWFLAKE_INDEX[i];
+            StageLayer.SNOWFLAKE_INDEX[i] = StageLayer.SNOWFLAKE_INDEX[j];
+            StageLayer.SNOWFLAKE_INDEX[j] = temp;
+        }
     };
 
     /**
      * @param src データのソース
-     * @param prevSpaceCount 前回の最上階以下の通路数（通過したかもしれないアイスキューブ数）
+     * @param spaceCount 前回の最上階以下の通路数（通過したかもしれないアイスキューブ数）
      * @returns 壁データと最上階の床の位置
      */
-    private fixWallData = (src: number, prevSpaceCount: number): { data: number, topFloor: number } => {
+    private fixWallData = (src: number, spaceCount: number): { data: number, topFloor: number } => {
         const newData = Math.floor(this.random.generate() * (0xFF - src)) + src;
         const masked = Math.floor(this.random.generate() * newData) | StageLayer.EDGES_MASK;
         const topFloor = this.findTopFloor(masked);
@@ -228,8 +265,8 @@ export class StageLayer extends g.E {
         // - 通路を通過したアイスキューブが残っている可能性がある（海落下分は考えない）
         // - ペンギンの位置はアイスキューブ分の高さの可能性がある
         // - 新しく生成した壁データの最上階の通路の高さがペンギンの位置未満だと通過できない
-        if (topFloor < 1 || topFloor < prevSpaceCount) {
-            return this.fixWallData(src, prevSpaceCount);
+        if (topFloor < 1 || topFloor < spaceCount) {
+            return this.fixWallData(src, spaceCount);
         }
         return { data: masked, topFloor: topFloor };
     };
@@ -251,6 +288,19 @@ export class StageLayer extends g.E {
             i++;
         }
         return 0;
+    };
+
+    /**
+     * @param src 壁データ 
+     * @returns フロアの位置の配列
+     */
+    private findFloor = (src: number): number[] => {
+        const offset = StageLayer.ROW - 1;
+        const floor = [];
+        for (let i = 1; i < offset; i++) {
+            if (((src >>> i) & 0x3) === 1) floor.push(i);
+        }
+        return floor;
     };
 
     /**
