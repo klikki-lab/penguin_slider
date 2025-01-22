@@ -76,7 +76,7 @@ export class GameScene extends g.Scene {
             game: g.game,
             assetIds: [
                 "img_background", "img_distant_star", "img_moon",
-                "img_penguin", "img_penguin_beak", "img_penguin_tail",
+                "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_exclamation_mark",
                 "img_ice_cube", "img_smoke",
                 "img_snowflake_01", "img_snowflake_02", "img_snowflake_03", "img_snowflake_04", "img_snowflake_05",
                 "img_wall", "img_snow_covered_01", "img_snow_covered_02",
@@ -94,7 +94,7 @@ export class GameScene extends g.Scene {
 
     private loadHandler = (): void => {
         this.holdRepeater = new MouseButtonHoldRepeater();
-        this.speedController = new SpeedController(this.isEasyMode ? { limit: 0.2 } : {});
+        this.speedController = new SpeedController(this.isEasyMode ? { limit: 0.1 } : {});
 
         this.audioController = new AudioController(0.2, 0.1);
         const sounds = [
@@ -259,7 +259,7 @@ export class GameScene extends g.Scene {
     private finishGame = (): void => {
         if (this.blackout) return;
 
-        if (this.snowflakeStorage.isRelease) {
+        if (this.snowflakeStorage.isFull()) {
             this.snowflakeStorage.release();
         }
         this.stageLayer.finish();
@@ -497,7 +497,8 @@ export class GameScene extends g.Scene {
 
                                 this.penguin.obtainSnowFlake();
                                 if (snowflake.score !== 200) {
-                                    const count = Math.floor(snowflake.score / 100);
+                                    const rate = this.isEasyMode ? .75 : 1;
+                                    const count = Math.max(1, Math.floor(snowflake.score / 100 * rate));
                                     this.snowflakeStorage.add(count);
                                 }
                                 this.scoreLabel.addScore(snowflake.score);
