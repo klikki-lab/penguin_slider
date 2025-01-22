@@ -496,7 +496,7 @@ export class GameScene extends g.Scene {
 
                                 this.penguin.obtainSnowFlake();
                                 if (snowflake.score !== 200) {
-                                    const rate = this.isEasyMode ? 10.75 : 1;
+                                    const rate = this.isEasyMode ? .75 : 1;
                                     const count = Math.max(1, Math.floor(snowflake.score / 100 * rate));
                                     this.snowflakeStorage.add(count);
                                 }
