@@ -7,6 +7,7 @@ export class Penguin extends Entity {
 
     private beak: g.Sprite;
     private tail: g.Sprite;
+    // private surpriseEffect: g.Sprite;
     private _collectedSnowFlake = 0;
     private _missCount = 0;
     private _isCrushed = false;
@@ -33,6 +34,17 @@ export class Penguin extends Entity {
         this.tail.x = 0;
         this.tail.y = this.height * .9;
         this.append(this.tail);
+
+        // this.surpriseEffect = new g.Sprite({
+        //     scene: scene,
+        //     src: scene.asset.getImageById("img_exclamation_mark"),
+        //     anchorX: .5,
+        //     anchorY: .5,
+        //     x: this.width / 2,
+        //     y: -this.height / 2,
+        // });
+        // // this.surpriseEffect.hide();
+        // this.append(this.surpriseEffect);
 
         this.init();
     }
@@ -79,6 +91,25 @@ export class Penguin extends Entity {
     falled = (): void => {
         this._isFalled = true;
         this._missCount++;
+    };
+
+    surprise = (): void => {
+        const surpriseMark = new g.Sprite({
+            scene: this.scene,
+            src: this.scene.asset.getImageById("img_exclamation_mark"),
+            anchorX: .5,
+            anchorY: .5,
+            x: this.width,
+            y: -this.height * .5,
+        });
+        let life = g.game.fps * .75;
+        surpriseMark.onUpdate.add(() => {
+            if (life-- <= 0) {
+                surpriseMark.destroy();
+                return true;
+            }
+        });
+        this.append(surpriseMark);
     };
 
     get isCrushed(): boolean { return this._isCrushed; }

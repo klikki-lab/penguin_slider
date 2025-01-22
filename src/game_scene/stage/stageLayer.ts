@@ -20,6 +20,7 @@ export class StageLayer extends g.E {
     private static readonly LEVEL_MIN_OFFSETS = [0, 0x2F, 0x3F, 0x4F, 0x5F, 0x6F, 0x7F];
 
     private _onFinishBonusTime: () => void;
+    private _onSurprise: () => void;
     private _snowflakes: g.E;
     private _snowFlakeCount = 0;
     private step = 0;
@@ -104,6 +105,7 @@ export class StageLayer extends g.E {
                             if (levelRate > 0.6 && levelRate < 0.9 && storageRate < .5 &&
                                 this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 4)) {
                                 this.startBonusArea(perSec);
+                                this._onSurprise();
                             }
                         }
                     }
@@ -352,4 +354,6 @@ export class StageLayer extends g.E {
     get snowflakeCount(): number { return this._snowFlakeCount; }
 
     set onFinishBonusTime(callback: () => void) { this._onFinishBonusTime = callback; }
+
+    set onSurprise(callback: () => void) { this._onSurprise = callback; }
 }

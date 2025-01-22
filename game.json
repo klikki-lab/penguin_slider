@@ -309,6 +309,18 @@
 				]
 			}
 		},
+		"img_easy_mode_button": {
+			"type": "image",
+			"path": "image/img_easy_mode_button.png",
+			"width": 524,
+			"height": 100
+		},
+		"img_exclamation_mark": {
+			"type": "image",
+			"path": "image/img_exclamation_mark.png",
+			"width": 64,
+			"height": 64
+		},
 		"audioController": {
 			"type": "script",
 			"path": "script/common/audioController.js",
@@ -434,6 +446,11 @@
 			"path": "script/game_scene/hud/scoreLabel.js",
 			"global": true
 		},
+		"snowflakeStorage": {
+			"type": "script",
+			"path": "script/game_scene/hud/snowflakeStorage.js",
+			"global": true
+		},
 		"speedometer": {
 			"type": "script",
 			"path": "script/game_scene/hud/speedometer.js",
@@ -447,6 +464,11 @@
 		"speedController": {
 			"type": "script",
 			"path": "script/game_scene/speedController.js",
+			"global": true
+		},
+		"snowflake": {
+			"type": "script",
+			"path": "script/game_scene/stage/snowflake.js",
 			"global": true
 		},
 		"stageLayer": {
@@ -478,28 +500,6 @@
 			"type": "script",
 			"path": "script/_bootstrap.js",
 			"global": true
-		},
-		"snowflakeStorage": {
-			"type": "script",
-			"path": "script/game_scene/hud/snowflakeStorage.js",
-			"global": true
-		},
-		"snowflake": {
-			"type": "script",
-			"path": "script/game_scene/stage/snowflake.js",
-			"global": true
-		},
-		"img_easy_mode_button": {
-			"type": "image",
-			"path": "image/img_easy_mode_button.png",
-			"width": 524,
-			"height": 100
-		},
-		"img_exclamation_mark": {
-			"type": "image",
-			"path": "image/img_exclamation_mark.png",
-			"width": 60,
-			"height": 58
 		}
 	},
 	"moduleMainScripts": {

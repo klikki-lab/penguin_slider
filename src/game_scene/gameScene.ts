@@ -124,9 +124,8 @@ export class GameScene extends g.Scene {
         this.effectBackLayer.children = [];
 
         this.stageLayer = new StageLayer(this, this.param.random);
-        this.stageLayer.onFinishBonusTime = () => {
-            this.snowflakeStorage.release();
-        };
+        this.stageLayer.onFinishBonusTime = () => this.snowflakeStorage.release();
+        this.stageLayer.onSurprise = () => this.penguin.surprise();
         this.append(this.stageLayer);
 
         this.iceCubes = new g.E({ scene: this, parent: this });
@@ -497,7 +496,7 @@ export class GameScene extends g.Scene {
 
                                 this.penguin.obtainSnowFlake();
                                 if (snowflake.score !== 200) {
-                                    const rate = this.isEasyMode ? .75 : 1;
+                                    const rate = this.isEasyMode ? 10.75 : 1;
                                     const count = Math.max(1, Math.floor(snowflake.score / 100 * rate));
                                     this.snowflakeStorage.add(count);
                                 }
