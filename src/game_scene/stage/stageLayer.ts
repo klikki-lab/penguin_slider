@@ -60,6 +60,8 @@ export class StageLayer extends g.E {
         this.startWall == -1;
         this.possibleMaxIceCube = 0;
         this.bonusDuration = 0;
+        this.startBonusStep = 0;
+        this.endBonusStep = 0;
 
         for (this.step = -1; this.step < StageLayer.COL; this.step++) {
             this.appendWall(this.step, 0, 0);

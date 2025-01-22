@@ -64,8 +64,7 @@ export class SnowflakeStorage extends g.Pane {
             if (this.ratio() >= 1) {
                 if (g.game.age % 3 === 0) {
                     this.angle = g.game.random.generate() * 10 - 5;
-                    this.scaleX = 1.25;
-                    this.scaleY = 1.25;
+                    this.scale(1.25);
                 }
             }
         }
@@ -96,8 +95,7 @@ export class SnowflakeStorage extends g.Pane {
         this.rect.height = this.height * rate;
         this.rect.modified();
 
-        this.scaleX = 1.1;
-        this.scaleY = 1.1;
+        this.scale(1.1);
         this.modified();
     };
 
@@ -105,6 +103,7 @@ export class SnowflakeStorage extends g.Pane {
         this.count = 0;
         this._isRelease = false;
 
+        this.scale(1);
         this.angle = 0;
         this.modified();
 
