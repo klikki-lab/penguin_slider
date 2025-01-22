@@ -494,6 +494,12 @@
 			"path": "image/img_easy_mode_button.png",
 			"width": 524,
 			"height": 100
+		},
+		"img_exclamation_mark": {
+			"type": "image",
+			"path": "image/img_exclamation_mark.png",
+			"width": 60,
+			"height": 58
 		}
 	},
 	"moduleMainScripts": {
