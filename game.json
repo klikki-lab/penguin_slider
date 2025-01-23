@@ -507,9 +507,9 @@
 			"width": 61,
 			"height": 25
 		},
-		"img_msg_amaizing": {
+		"img_msg_amazing": {
 			"type": "image",
-			"path": "image/img_msg_amaizing.png",
+			"path": "image/img_msg_amazing.png",
 			"width": 111,
 			"height": 27
 		}
