@@ -83,7 +83,7 @@ export class GameScene extends g.Scene {
                 "img_crush", "img_splash", "img_speedometer", "img_speedometer_needle",
                 "img_cloud", "img_drift_ice",
                 "img_blackout", "img_start", "img_finish", "img_snow", "img_pause_message",
-                "img_speech_bubble", "img_msg_omg", "img_msg_amaizing", "img_msg_superb",
+                "img_speech_bubble", "img_msg_omg", "img_msg_amazing", "img_msg_superb",
                 "img_msg_excellent", "img_msg_nice", "img_msg_good", "img_msg_thanks",
                 "img_font", "font_glyphs",
                 "se_splash", "se_spawn_ice_cube", "se_obtain", "se_crush", "se_hitting_head", MusicId.BGM,
@@ -357,9 +357,10 @@ export class GameScene extends g.Scene {
         //     ` ,collected: ${this.penguin.collectedSnowFlake}` +
         //     ` ,count: ${this.stageLayer.snowFlakeCount}`);
 
-        if (this.scoreLabel.isCounterStop()) return "img_omg";
+        if (this.scoreLabel.isCounterStop()) return "img_msg_omg";
         if (this.penguin.isNoMiss()) {
-            if (this.penguin.collectedRareSnowFlake === this.stageLayer.rareSnowflakeCount) return "img_msg_amaizing";
+            const isPerfect = this.penguin.collectedRareSnowFlake === this.stageLayer.rareSnowflakeCount;
+            if (collectRate >= 1.0 && isPerfect) return "img_msg_amazing";
             if (collectRate >= 1.0) return "img_msg_superb";
             if (collectRate >= 0.9) return "img_msg_excellent";
             if (collectRate >= 0.8) return "img_msg_nice";
@@ -367,8 +368,8 @@ export class GameScene extends g.Scene {
         }
         const missCount = this.penguin.missCount;
         if (missCount <= 1 && collectRate >= 1.0) return "img_msg_excellent";
-        if (collectRate >= 0.9) return "img_msg_nice";
-        if (collectRate >= 0.7) return "img_msg_good";
+        if (collectRate >= 0.8) return "img_msg_nice";
+        if (collectRate >= 0.6) return "img_msg_good";
         return "img_msg_thanks";
     };
 
