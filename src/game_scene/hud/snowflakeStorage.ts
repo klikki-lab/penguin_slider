@@ -1,9 +1,9 @@
 export class SnowflakeStorage extends g.Pane {
 
     private static readonly DEFAULT_CAPACITY = 100;
-    // private static readonly SNOWFLAKE_COUNT = 8;
+    private static readonly SNOWFLAKE_COUNT = 8;
 
-    //private snowflakes: Snowflake[] = [];
+    private snowflakes: Snowflake[] = [];
     private rect: g.FilledRect;
     private count = 0;
     private _isRelease = false;
@@ -34,11 +34,11 @@ export class SnowflakeStorage extends g.Pane {
             opacity: .9,
         });
 
-        // for (let i = 0; i < SnowflakeStorage.SNOWFLAKE_COUNT; i++) {
-        //     const snowflake = new Snowflake(scene, this.width / 2, this.height / 2);
-        //     this.snowflakes.push(snowflake);
-        //     this.append(snowflake);
-        // }
+        for (let i = 0; i < SnowflakeStorage.SNOWFLAKE_COUNT; i++) {
+            const snowflake = new Snowflake(scene, this.width / 2, this.height / 2);
+            this.snowflakes.push(snowflake);
+            this.append(snowflake);
+        }
 
         this.onUpdate.add(this.updateHanler);
     }
@@ -64,7 +64,7 @@ export class SnowflakeStorage extends g.Pane {
             if (this.ratio() >= 1) {
                 if (g.game.age % 3 === 0) {
                     this.angle = g.game.random.generate() * 10 - 5;
-                    this.scale(1.25);
+                    this.scale(1.3);
                 }
             }
         }
@@ -97,6 +97,10 @@ export class SnowflakeStorage extends g.Pane {
 
         this.scale(1.1);
         this.modified();
+
+        if (this.isFull()) {
+            this.snowflakes.forEach(snowflake => snowflake.start());
+        }
     };
 
     init = (): void => {
@@ -109,12 +113,14 @@ export class SnowflakeStorage extends g.Pane {
 
         this.rect.height = this.height;
         this.rect.modified();
+
+        this.snowflakes.forEach(snowflake => snowflake.stop());
     };
 
     release = (): void => {
         if (!this._isRelease) {
             this._isRelease = true;
-            //this.snowflakes.forEach(snowflake => snowflake.start());
+            this.snowflakes.forEach(snowflake => snowflake.stop());
         }
     };
 
@@ -154,7 +160,7 @@ class Snowflake extends g.Sprite {
     private init = (): void => {
         const vx = g.game.random.generate() * 2 - 1;
         const vy = g.game.random.generate() * 2 - 1;
-        const speed = g.game.random.generate() * 5 + 1 * this.width / g.game.fps * 2;
+        const speed = g.game.random.generate() * 6 + 3 * this.width / g.game.fps * 2;
         this.velocity = { x: vx * speed, y: vy * speed };
         this.opacity = 1;
         this.x = this.initX;
@@ -168,10 +174,10 @@ class Snowflake extends g.Sprite {
         this.y += this.velocity.y;
         this.velocity.x *= .9;
         this.velocity.y *= .9;
-        this.opacity *= .9;
-        if (this.opacity < 0.1) {
-            // this.init();
-            return true;
+        this.opacity *= .8;
+        if (this.opacity < 0.2) {
+            this.init();
+            // return true;
         }
         this.modified();
     };
