@@ -124,7 +124,9 @@ export class GameScene extends g.Scene {
         this.effectBackLayer.children = [];
 
         this.stageLayer = new StageLayer(this, this.param.random);
-        this.stageLayer.onFinishBonusTime = () => this.snowflakeStorage.release();
+        this.stageLayer.onFinishBonusTime = isSurprise => {
+            if (!isSurprise) this.snowflakeStorage.release();
+        };
         this.stageLayer.onSurprise = () => this.penguin.surprise();
         this.append(this.stageLayer);
 
@@ -146,6 +148,13 @@ export class GameScene extends g.Scene {
     };
 
     private pointDownHandler = (_event: g.PointDownEvent): void => {
+        // 右クリックでスクショ。この処理を行う場合はtsconfigにdomを追加すること。
+        // if (_event.button === 2) {
+        //     const link = document.getElementsByClassName("pure-button")[2];
+        //     (link as HTMLAnchorElement).click();
+        //     return;
+        // }
+
         if (!this.isClicked) {
             this.isClicked = true;
             if (this.destroyPauseMessageIfExists()) return;
@@ -493,13 +502,10 @@ export class GameScene extends g.Scene {
                             if (snowflake instanceof Snowflake && !snowflake.isObtained) {
                                 this.audioController.playSE(SoundId.OBTAIN);
                                 snowflake.obtain();
-
                                 this.penguin.obtainSnowFlake();
-                                if (snowflake.score !== 200) {
-                                    const rate = this.isEasyMode ? .75 : 1;
-                                    const count = Math.max(1, Math.floor(snowflake.score / 100 * rate));
-                                    this.snowflakeStorage.add(count);
-                                }
+                                const count = snowflake.score <= 200 ? 1 : this.isEasyMode ? 2 : 3;
+                                this.snowflakeStorage.add(count);
+
                                 this.scoreLabel.addScore(snowflake.score);
                                 new SplashFragments(this, this.effectMiddleLayer, snowflake);
 

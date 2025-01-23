@@ -19,7 +19,7 @@ export class StageLayer extends g.E {
     private static readonly PITFALL_MASK = 0x1FC;
     private static readonly LEVEL_MIN_OFFSETS = [0, 0x2F, 0x3F, 0x4F, 0x5F, 0x6F, 0x7F];
 
-    private _onFinishBonusTime: () => void;
+    private _onFinishBonusTime: (isSurprise: boolean) => void;
     private _onSurprise: () => void;
     private _snowflakes: g.E;
     private _snowFlakeCount = 0;
@@ -33,8 +33,9 @@ export class StageLayer extends g.E {
     private startBonusStep = 0;
     private endBonusStep = 0;
     private bonusTimes = 0;
-    private isEnd = false;
     private endStep = 0;
+    private isEnd = false;
+    private isSurprise = false;
 
     constructor(scene: g.Scene, private random: g.RandomGenerator) {
         super({ scene: scene, });
@@ -62,6 +63,7 @@ export class StageLayer extends g.E {
         this.bonusDuration = 0;
         this.startBonusStep = 0;
         this.endBonusStep = 0;
+        this.isSurprise = false;
 
         for (this.step = -1; this.step < StageLayer.COL; this.step++) {
             this.appendWall(this.step, 0, 0);
@@ -104,9 +106,10 @@ export class StageLayer extends g.E {
                         if (storageRate >= 1) {
                             this.startBonusArea(perSec);
                         } else {
-                            if (levelRate > 0.6 && levelRate < 0.9 && storageRate < .5 &&
+                            if (levelRate > 0.6 && levelRate < 0.9 && storageRate < .75 &&
                                 this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 4)) {
                                 this.startBonusArea(perSec);
+                                this.isSurprise = true;
                                 this._onSurprise();
                             }
                         }
@@ -183,7 +186,8 @@ export class StageLayer extends g.E {
             if (this.step >= end) {
                 this.startBonusStep = 0;
                 this.endBonusStep = 0;
-                this._onFinishBonusTime();
+                this._onFinishBonusTime(this.isSurprise);
+                this.isSurprise = false;
             }
         }
 
@@ -355,7 +359,7 @@ export class StageLayer extends g.E {
 
     get snowflakeCount(): number { return this._snowFlakeCount; }
 
-    set onFinishBonusTime(callback: () => void) { this._onFinishBonusTime = callback; }
+    set onFinishBonusTime(callback: (isSurprise: boolean) => void) { this._onFinishBonusTime = callback; }
 
     set onSurprise(callback: () => void) { this._onSurprise = callback; }
 }
