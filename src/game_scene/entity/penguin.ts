@@ -102,7 +102,7 @@ export class Penguin extends Entity {
             x: this.width,
             y: -this.height * .5,
         });
-        let life = g.game.fps * .75;
+        let life = g.game.fps;
         surpriseMark.onUpdate.add(() => {
             if (life-- <= 0) {
                 surpriseMark.destroy();
