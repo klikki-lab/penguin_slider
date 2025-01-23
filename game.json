@@ -500,6 +500,12 @@
 			"type": "script",
 			"path": "script/_bootstrap.js",
 			"global": true
+		},
+		"img_omg": {
+			"type": "image",
+			"path": "image/img_omg.png",
+			"width": 61,
+			"height": 25
 		}
 	},
 	"moduleMainScripts": {
