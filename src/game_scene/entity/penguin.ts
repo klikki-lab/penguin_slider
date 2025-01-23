@@ -9,6 +9,7 @@ export class Penguin extends Entity {
     private tail: g.Sprite;
     // private surpriseEffect: g.Sprite;
     private _collectedSnowFlake = 0;
+    private _collectedRareSnowFlake = 0;
     private _missCount = 0;
     private _isCrushed = false;
     private _isFalled = false;
@@ -74,9 +75,16 @@ export class Penguin extends Entity {
 
     private getGroundY = (): number => this.height * Penguin.OFFSET_Y;
 
-    obtainSnowFlake = (): void => { this._collectedSnowFlake++; };
+    obtainSnowFlake = (isRareSnowFlake: boolean): void => {
+        if (isRareSnowFlake) {
+            this._collectedRareSnowFlake++;
+        }
+        this._collectedSnowFlake++;
+    };
 
     get collectedSnowFlake(): number { return this._collectedSnowFlake; }
+
+    get collectedRareSnowFlake(): number { return this._collectedRareSnowFlake; }
 
     isFalling = (): boolean => this.y > this.getGroundY();
 

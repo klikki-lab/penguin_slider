@@ -83,7 +83,8 @@ export class GameScene extends g.Scene {
                 "img_crush", "img_splash", "img_speedometer", "img_speedometer_needle",
                 "img_cloud", "img_drift_ice",
                 "img_blackout", "img_start", "img_finish", "img_snow", "img_pause_message",
-                "img_speech_bubble", "img_omg", "img_msg_superb", "img_msg_excellent", "img_msg_nice", "img_msg_good", "img_msg_thanks",
+                "img_speech_bubble", "img_msg_omg", "img_msg_amaizing", "img_msg_superb",
+                "img_msg_excellent", "img_msg_nice", "img_msg_good", "img_msg_thanks",
                 "img_font", "font_glyphs",
                 "se_splash", "se_spawn_ice_cube", "se_obtain", "se_crush", "se_hitting_head", MusicId.BGM,
             ],
@@ -355,17 +356,19 @@ export class GameScene extends g.Scene {
         //     ` ,collectRate: ${collectRate}` +
         //     ` ,collected: ${this.penguin.collectedSnowFlake}` +
         //     ` ,count: ${this.stageLayer.snowFlakeCount}`);
+
         if (this.scoreLabel.isCounterStop()) return "img_omg";
         if (this.penguin.isNoMiss()) {
+            if (this.penguin.collectedRareSnowFlake === this.stageLayer.rareSnowflakeCount) return "img_msg_amaizing";
             if (collectRate >= 1.0) return "img_msg_superb";
-            else if (collectRate >= 0.9) return "img_msg_excellent";
-            else if (collectRate >= 0.8) return "img_msg_nice";
-            else if (collectRate >= 0.7) return "img_msg_good";
+            if (collectRate >= 0.9) return "img_msg_excellent";
+            if (collectRate >= 0.8) return "img_msg_nice";
+            if (collectRate >= 0.7) return "img_msg_good";
         }
         const missCount = this.penguin.missCount;
         if (missCount <= 1 && collectRate >= 1.0) return "img_msg_excellent";
-        else if (collectRate >= 0.9) return "img_msg_nice";
-        else if (collectRate >= 0.7) return "img_msg_good";
+        if (collectRate >= 0.9) return "img_msg_nice";
+        if (collectRate >= 0.7) return "img_msg_good";
         return "img_msg_thanks";
     };
 
@@ -502,7 +505,7 @@ export class GameScene extends g.Scene {
                             if (snowflake instanceof Snowflake && !snowflake.isObtained) {
                                 this.audioController.playSE(SoundId.OBTAIN);
                                 snowflake.obtain();
-                                this.penguin.obtainSnowFlake();
+                                this.penguin.obtainSnowFlake(snowflake.score === 300);
                                 const count = snowflake.score <= 200 ? 1 : this.isEasyMode ? 2 : 3;
                                 this.snowflakeStorage.add(count);
 

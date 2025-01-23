@@ -23,6 +23,7 @@ export class StageLayer extends g.E {
     private _onSurprise: () => void;
     private _snowflakes: g.E;
     private _snowFlakeCount = 0;
+    private _rareSnowFlakeCount = 0;
     private step = 0;
     private interval = 0;
     private wallDuration = 0;
@@ -151,6 +152,9 @@ export class StageLayer extends g.E {
                             const assetId = StageLayer.SNOWFLAKE_ASSET_IDS[index];
                             const score = index * 200 + 100;
                             this.appendSnowFlake(wall.x, wall.y - wall.height / 2, assetId, score);
+
+                            if (index === 1) this._rareSnowFlakeCount++;
+                            this._snowFlakeCount++;
                         }
                     }
                     height += index;
@@ -208,7 +212,7 @@ export class StageLayer extends g.E {
                 this.wallDuration = Math.floor(this.random.generate() * col) + StageLayer.MIN_WALL_WIDTH;
             }
         }
-        this._snowFlakeCount += this.wallDuration;
+        // this._snowFlakeCount += this.wallDuration;
         this.startWall = this.wallDuration;
 
         const level = Math.floor((StageLayer.LEVEL_MIN_OFFSETS.length - 1) * levelRate);
@@ -358,6 +362,8 @@ export class StageLayer extends g.E {
     get snowflakes(): g.E[] { return this._snowflakes.children; }
 
     get snowflakeCount(): number { return this._snowFlakeCount; }
+
+    get rareSnowflakeCount(): number { return this._rareSnowFlakeCount; }
 
     set onFinishBonusTime(callback: (isSurprise: boolean) => void) { this._onFinishBonusTime = callback; }
 

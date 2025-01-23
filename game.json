@@ -501,11 +501,17 @@
 			"path": "script/_bootstrap.js",
 			"global": true
 		},
-		"img_omg": {
+		"img_msg_omg": {
 			"type": "image",
-			"path": "image/img_omg.png",
+			"path": "image/img_msg_omg.png",
 			"width": 61,
 			"height": 25
+		},
+		"img_msg_amaizing": {
+			"type": "image",
+			"path": "image/img_msg_amaizing.png",
+			"width": 111,
+			"height": 27
 		}
 	},
 	"moduleMainScripts": {
