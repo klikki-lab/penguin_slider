@@ -23,6 +23,7 @@ export class TitleScene extends g.Scene {
     private startButton: Button;
     private startEasyModeButton: Button;
     private holdRepeater: MouseButtonHoldRepeater;
+    private prevX = 0;
     private isClicked = false;
     private isClickedStartButton = false;
     private isClickedStartEasyModeButton = false;
@@ -151,10 +152,11 @@ export class TitleScene extends g.Scene {
             iceCube.modified();
         });
 
-        if (g.game.age % Math.floor(g.game.fps / Math.min(this.penguin.velocity.x, g.game.fps) * 2) === 0) {
+        if (this.penguin.x > this.prevX + this.penguin.width / 2) {
             const y = (StageLayer.ROW - 2) * this.penguin.height + this.penguin.height;
             const pos = { x: this.penguin.x - this.penguin.width / 2, y: y };
             this.smokeLayer.append(new SnowSmoke(this, pos));
+            this.prevX = this.penguin.x;
         }
 
         if (this.holdRepeater.canPerformAction()) {
@@ -170,6 +172,7 @@ export class TitleScene extends g.Scene {
         const penguin = new Penguin(this);
         penguin.init();
         penguin.velocity.x = (g.game.width + penguin.getWidth() * 4) / (this.timeLimit * g.game.fps);
+        this.prevX = penguin.x;
         return penguin;
     };
 
