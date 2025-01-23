@@ -83,7 +83,7 @@ export class GameScene extends g.Scene {
                 "img_crush", "img_splash", "img_speedometer", "img_speedometer_needle",
                 "img_cloud", "img_drift_ice",
                 "img_blackout", "img_start", "img_finish", "img_snow", "img_pause_message",
-                "img_speech_bubble", "img_msg_superb", "img_msg_excellent", "img_msg_nice", "img_msg_good", "img_msg_thanks",
+                "img_speech_bubble", "img_omg", "img_msg_superb", "img_msg_excellent", "img_msg_nice", "img_msg_good", "img_msg_thanks",
                 "img_font", "font_glyphs",
                 "se_splash", "se_spawn_ice_cube", "se_obtain", "se_crush", "se_hitting_head", MusicId.BGM,
             ],
@@ -355,7 +355,7 @@ export class GameScene extends g.Scene {
         //     ` ,collectRate: ${collectRate}` +
         //     ` ,collected: ${this.penguin.collectedSnowFlake}` +
         //     ` ,count: ${this.stageLayer.snowFlakeCount}`);
-
+        if (this.scoreLabel.isCounterStop()) return "img_omg";
         if (this.penguin.isNoMiss()) {
             if (collectRate >= 1.0) return "img_msg_superb";
             else if (collectRate >= 0.9) return "img_msg_excellent";

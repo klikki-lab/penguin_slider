@@ -37,4 +37,6 @@ export class ScoreLabel extends g.Label {
                 this.setText(clamped - Math.floor(score * (1 - p)));
             }, duration);
     };
+
+    isCounterStop = (): boolean => g.game.vars.gameState.score >= ScoreLabel.COUNTER_STOP;
 }
