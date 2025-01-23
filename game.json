@@ -318,8 +318,8 @@
 		"img_exclamation_mark": {
 			"type": "image",
 			"path": "image/img_exclamation_mark.png",
-			"width": 64,
-			"height": 64
+			"width": 96,
+			"height": 96
 		},
 		"audioController": {
 			"type": "script",
