@@ -7,7 +7,7 @@ export class Penguin extends Entity {
 
     private beak: g.Sprite;
     private tail: g.Sprite;
-    // private surpriseEffect: g.Sprite;
+    private surpriseMark: g.Sprite;
     private _collectedSnowFlake = 0;
     private _collectedRareSnowFlake = 0;
     private _missCount = 0;
@@ -36,16 +36,16 @@ export class Penguin extends Entity {
         this.tail.y = this.height * .9;
         this.append(this.tail);
 
-        // this.surpriseEffect = new g.Sprite({
-        //     scene: scene,
-        //     src: scene.asset.getImageById("img_exclamation_mark"),
-        //     anchorX: .5,
-        //     anchorY: .5,
-        //     x: this.width / 2,
-        //     y: -this.height / 2,
-        // });
-        // // this.surpriseEffect.hide();
-        // this.append(this.surpriseEffect);
+        this.surpriseMark = new g.Sprite({
+            scene: this.scene,
+            parent: this,
+            src: this.scene.asset.getImageById("img_exclamation_mark"),
+            anchorX: .5,
+            anchorY: .5,
+            x: this.width,
+            y: -this.height * .5,
+        });
+        this.surpriseMark.hide();
 
         this.init();
     }
@@ -62,6 +62,7 @@ export class Penguin extends Entity {
                 }
             });
         }
+        this.hideSurpriseMark();
 
         this.initVelocityY();
         this.angle = 0;
@@ -94,31 +95,35 @@ export class Penguin extends Entity {
         this.velocity.x = -this.width / g.game.fps * (2 * (1 + speedRate));
         this.velocity.y = (1 - this.y / g.game.height) * (this.height / g.game.fps) * 4;
         this.tail.onUpdate.removeAll();
+
+        this.hideSurpriseMark();
     };
 
     falled = (): void => {
         this._isFalled = true;
         this._missCount++;
+        this.hideSurpriseMark();
     };
 
     surprise = (): void => {
-        const surpriseMark = new g.Sprite({
-            scene: this.scene,
-            src: this.scene.asset.getImageById("img_exclamation_mark"),
-            anchorX: .5,
-            anchorY: .5,
-            x: this.width,
-            y: -this.height * .5,
-        });
+        if (this.surpriseMark.visible()) return;
+
+        this.surpriseMark.show();
         let life = g.game.fps;
-        surpriseMark.onUpdate.add(() => {
+        this.surpriseMark.onUpdate.add(() => {
             if (life-- <= 0) {
-                surpriseMark.destroy();
+                this.surpriseMark.hide();
                 return true;
             }
         });
-        this.append(surpriseMark);
     };
+
+    hideSurpriseMark = (): void => {
+        if (this.surpriseMark.visible()) {
+            this.surpriseMark.hide();
+            this.surpriseMark.onUpdate.removeAll();
+        }
+    }
 
     get isCrushed(): boolean { return this._isCrushed; }
 
