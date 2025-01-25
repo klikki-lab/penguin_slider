@@ -318,8 +318,8 @@
 		"img_exclamation_mark": {
 			"type": "image",
 			"path": "image/img_exclamation_mark.png",
-			"width": 96,
-			"height": 96
+			"width": 110,
+			"height": 110
 		},
 		"audioController": {
 			"type": "script",
@@ -512,6 +512,17 @@
 			"path": "image/img_msg_amazing.png",
 			"width": 111,
 			"height": 27
+		},
+		"img_halo": {
+			"type": "image",
+			"path": "image/img_halo.png",
+			"width": 128,
+			"height": 128
+		},
+		"feverLayer": {
+			"type": "script",
+			"path": "script/game_scene/hud/feverLayer.js",
+			"global": true
 		}
 	},
 	"moduleMainScripts": {
