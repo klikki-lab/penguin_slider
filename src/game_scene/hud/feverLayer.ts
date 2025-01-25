@@ -83,28 +83,7 @@ export class FeverLayer extends g.E {
         }
         this.halo.angle += 1;
         this.halo.modified();
-        console.log("update halo");
     }
-
-    private updateSnowflakesHanler = (): void => {
-        this.snowflakes.forEach(snowflake => {
-            snowflake.x += snowflake.velocity.x;
-            snowflake.y += snowflake.velocity.y;
-            snowflake.velocity.x *= .9;
-            snowflake.velocity.y *= .9;
-            snowflake.opacity *= .8;
-
-            if (this.opacity < 0.1) {
-                if (this._isStop) {
-                    this.opacity = 0;
-                } else {
-                    this.init();
-                }
-                // return true;
-            }
-            this.modified();
-        });
-    };
 }
 
 
@@ -128,17 +107,12 @@ class Snowflake extends g.Sprite {
     }
 
     start = (): void => {
-        // if (this.onUpdate.length !== 0) return;
-
-        // this.init(); 
         if (!this.onUpdate.contains(this.updateHandler)) {
             this.onUpdate.add(this.updateHandler);
         }
     };
 
     stop = (): void => {
-        // this.onUpdate.removeAll();
-        // this.hide();
         this.isStop = true;
     };
 
@@ -151,7 +125,6 @@ class Snowflake extends g.Sprite {
         this.opacity = 1;
         this.x = this.initX;
         this.y = this.initY;
-        // this.show();
         this.modified();
     };
 
@@ -161,7 +134,6 @@ class Snowflake extends g.Sprite {
         this.velocity.x *= .9;
         this.velocity.y *= .9;
         if (Math.abs(this.velocity.x) < 4 && Math.abs(this.velocity.y) < 4) {
-            // this.init();
             this.opacity *= .7;
             if (this.opacity < 0.1) {
                 if (this.isStop) {
@@ -170,13 +142,6 @@ class Snowflake extends g.Sprite {
                 this.init();
             }
         }
-
-        // if (this.opacity < 0.1) {
-        //     if (this.isStop) {
-        //         return true;
-        //     }
-        //     this.init();
-        // }
         this.modified();
     };
 }
