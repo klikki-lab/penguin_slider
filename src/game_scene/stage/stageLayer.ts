@@ -200,8 +200,8 @@ export class StageLayer extends g.E {
 
     private createNextWallData = (levelRate: number, speedRate: number, remainingTime: number, perSec: number): void => {
         const penguinOffsetX = 3;
-        const arrivalTime = (StageLayer.COL - penguinOffsetX) / perSec; // ペンギンが壁（右端）に到達する時間
-        if (remainingTime <= arrivalTime) { // 今から壁を作ってもペンギンまで到達しない可能性が高い場合
+        const arrivalTime = (StageLayer.COL - penguinOffsetX) / perSec; // ペンギンが壁（右端）に到達するおよその時間
+        if (remainingTime <= arrivalTime) { // 今から壁を作ってもペンギンまで到達しないと判断した場合は壁を作らない
             this.wallDuration = 0;
         } else {
             if (remainingTime <= arrivalTime * 1.8) {// 残り時間が少ない場合は残りは壁にする
@@ -212,7 +212,6 @@ export class StageLayer extends g.E {
                 this.wallDuration = Math.floor(this.random.generate() * col) + StageLayer.MIN_WALL_WIDTH;
             }
         }
-        // this._snowFlakeCount += this.wallDuration;
         this.startWall = this.wallDuration;
 
         const level = Math.floor((StageLayer.LEVEL_MIN_OFFSETS.length - 1) * levelRate);
@@ -263,7 +262,7 @@ export class StageLayer extends g.E {
     };
 
     /**
-     * @param src データのソース
+     * @param src 壁データのソース
      * @param spaceCount 前回の最上階以下の通路数（通過したかもしれないアイスキューブ数）
      * @returns 壁データと最上階の床の位置
      */
@@ -318,7 +317,7 @@ export class StageLayer extends g.E {
     /**
      * @param src 壁データ
      * @param topFloor 最上階の床の位置
-     * @returns 指定した最上階以下に存在するスペースの数
+     * @returns 指定した最上階以下に存在するスペース（存在するかもしれないアイスキューブ）の数
      */
     private countSpace = (src: number, topFloor: number): number => {
         let space = 0;
