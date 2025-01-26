@@ -76,7 +76,7 @@ export class Penguin extends Entity {
 
     private getGroundY = (): number => this.height * Penguin.OFFSET_Y;
 
-    obtainSnowFlake = (isRareSnowFlake: boolean): void => {
+    obtainSnowflake = (isRareSnowFlake: boolean): void => {
         if (isRareSnowFlake) {
             this._collectedRareSnowFlake++;
         }
