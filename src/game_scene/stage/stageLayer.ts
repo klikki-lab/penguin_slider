@@ -2,6 +2,14 @@ import { Entity } from "../entity/entity";
 import { Snowflake } from "./snowflake";
 import { Wall } from "./wall";
 
+const SupriseBonusPattern = {
+    CHECKBOARD: 0,
+    LATTICE: 1,
+    WAVE: 2,
+    // VERTICAL: 3,
+    // HORIZONTAL: 4,
+} as const;
+
 export class StageLayer extends g.E {
 
     /** 高さ 9 */
@@ -36,7 +44,8 @@ export class StageLayer extends g.E {
     private bonusTimes = 0;
     private endStep = 0;
     private isEnd = false;
-    private isSurprise = false;
+    private isSurpriseBonus = false;
+    private supriseBonusPattern = 0;
 
     constructor(scene: g.Scene, private random: g.RandomGenerator) {
         super({ scene: scene, });
@@ -64,7 +73,7 @@ export class StageLayer extends g.E {
         this.bonusDuration = 0;
         this.startBonusStep = 0;
         this.endBonusStep = 0;
-        this.isSurprise = false;
+        this.isSurpriseBonus = false;
 
         for (this.step = -1; this.step < StageLayer.COL; this.step++) {
             this.appendWall(this.step, 0, 0);
@@ -81,8 +90,8 @@ export class StageLayer extends g.E {
     needNextWall = (cameraX: number): boolean =>
         Math.floor(cameraX / Entity.SIZE) + StageLayer.COL + 1 > this.step;
 
-    private startBonusArea = (perSec: number): void => {
-        this.bonusDuration = Math.floor(this.random.generate() * perSec + perSec * 2);
+    private startBonusArea = (bonusDuration: number): void => {
+        this.bonusDuration = bonusDuration;
         this.startBonusStep = this.step;
         this.endBonusStep = this.step + this.bonusDuration;
         this.bonusTimes++;
@@ -105,12 +114,13 @@ export class StageLayer extends g.E {
 
                     if (this.wallDuration === 0 && this.step - this.endBonusStep > StageLayer.COL) {
                         if (storageRate >= 1) {
-                            this.startBonusArea(perSec);
+                            this.startBonusArea(Math.floor(this.random.generate() * perSec + perSec * 2));
                         } else {
                             if (levelRate > 0.6 && levelRate < 0.9 && storageRate < .75 &&
                                 this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 4)) {
-                                this.startBonusArea(perSec);
-                                this.isSurprise = true;
+                                this.startBonusArea(Math.floor(this.random.generate() * perSec + perSec * 2));
+                                this.isSurpriseBonus = true;
+                                this.supriseBonusPattern = Math.floor(this.random.generate() * Object.keys(SupriseBonusPattern).length);
                                 this._onSurprise();
                             }
                         }
@@ -136,6 +146,8 @@ export class StageLayer extends g.E {
         }
 
         if (this.wallDuration > 0) {
+            let snowflakeCount = 0;
+            let rareSnowflakeCount = 0;
             let snowflakeIndex = 0;
             let height = 0;
             while (height < StageLayer.ROW) {
@@ -148,13 +160,16 @@ export class StageLayer extends g.E {
                     if (height > 0) {
                         this.appendSnowCovered(wall);
                         if (height < StageLayer.ROW - 1) {
-                            const index = StageLayer.SNOWFLAKE_INDEX[Math.min(snowflakeIndex++, StageLayer.SNOWFLAKE_INDEX.length - 1)];
-                            const assetId = StageLayer.SNOWFLAKE_ASSET_IDS[index];
-                            const score = index * 200 + 100;
+                            const min = Math.min(snowflakeIndex++, StageLayer.SNOWFLAKE_INDEX.length - 1);
+                            const assetIndex = StageLayer.SNOWFLAKE_INDEX[min];
+                            const assetId = StageLayer.SNOWFLAKE_ASSET_IDS[assetIndex];
+                            const score = assetIndex * 200 + 100;
                             this.appendSnowFlake(wall.x, wall.y - wall.height / 2, assetId, score);
 
-                            if (index === 1) this._rareSnowFlakeCount++;
-                            this._snowFlakeCount++;
+                            if (assetIndex === 1) {
+                                rareSnowflakeCount++;
+                            }
+                            snowflakeCount++;
                         }
                     }
                     height += index;
@@ -162,15 +177,74 @@ export class StageLayer extends g.E {
                     height++;
                 }
             }
+            if (rareSnowflakeCount > 0) {
+                this._rareSnowFlakeCount++;
+            }
+            if (snowflakeCount > 0) {
+                this._snowFlakeCount++;
+            }
         } else if (this.bonusDuration > 0) {
             this.bonusDuration--;
-            const wall = this.appendWall(this.step, 0, 0);
-            if (this.step - this.startBonusStep > 2 && this.bonusDuration > 2) {
+            this.appendWall(this.step, 0, 0);
+
+            if (this.isSurpriseBonus) {
+                if (this.step - this.startBonusStep > 2 && this.bonusDuration > 2) {
+                    const offsetY = 3;
+                    const maxY = StageLayer.ROW - 1;
+                    const stepIndex = this.step - this.startBonusStep;
+                    let snowfrakeCount = 0;
+                    switch (this.supriseBonusPattern) {
+                        default:
+                        case SupriseBonusPattern.CHECKBOARD:
+                            for (let i = offsetY; i < maxY; i++) {
+                                if ((stepIndex + i) % 2 === 1) {
+                                    this.appendBonusSnowflake(i);
+                                    snowfrakeCount++;
+                                }
+                            }
+                            break;
+                        case SupriseBonusPattern.LATTICE:
+                            for (let i = offsetY; i < maxY; i++) {
+                                if (i % 2 === 0 || stepIndex % 2 === 0) {
+                                    this.appendBonusSnowflake(i);
+                                    snowfrakeCount++;
+                                }
+                            }
+                            break;
+                        case SupriseBonusPattern.WAVE:
+                            const height = maxY - offsetY;
+                            for (let i = offsetY; i < maxY; i++) {
+                                const waveY = ((Math.sin(stepIndex / 2) + 1) * (height / 2)) + offsetY;
+                                if (Math.abs(waveY - i) < 2) {
+                                    this.appendBonusSnowflake(i);
+                                    snowfrakeCount++;
+                                }
+                            }
+                            break;
+                        // case SupriseBonusPattern.VERTICAL:
+                        //     for (let i = offsetY; i < maxY; i++) {
+                        //         if (stepIndex % 2 === 1) {
+                        //             this.appendBonusSnowflake(i);
+                        //             snowfrakeCount++;
+                        //         }
+                        //     }
+                        //     break;
+                        // case SupriseBonusPattern.HORIZONTAL:
+                        //     for (let i = offsetY; i < maxY; i++) {
+                        //         if (i % 2 === 1) {
+                        //             this.appendBonusSnowflake(i);
+                        //             snowfrakeCount++;
+                        //         }
+                        //     }
+                        //     break;
+                    }
+                    if (snowfrakeCount > 0) {
+                        this._snowFlakeCount++;
+                    }
+                }
+            } else if (this.step - this.startBonusStep > 2 && this.bonusDuration > 2) {
                 for (let i = 3; i < StageLayer.ROW - 1; i++) {
-                    const index = Math.floor(this.random.generate() * StageLayer.BONUS_SNOWFLAKE_ASSET_IDS.length);
-                    const assetId = StageLayer.BONUS_SNOWFLAKE_ASSET_IDS[index];
-                    const score = 200;
-                    this.appendSnowFlake(wall.x, Entity.SIZE * i, assetId, score);
+                    this.appendBonusSnowflake(i);
                 }
                 this._snowFlakeCount++;
             }
@@ -190,12 +264,20 @@ export class StageLayer extends g.E {
             if (this.step >= end) {
                 this.startBonusStep = 0;
                 this.endBonusStep = 0;
-                this._onFinishBonusTime(this.isSurprise);
-                this.isSurprise = false;
+                this._onFinishBonusTime(this.isSurpriseBonus);
+                this.isSurpriseBonus = false;
             }
         }
 
         this.step++;
+    };
+
+    private appendBonusSnowflake = (y: number): void => {
+        const wall = this.appendWall(this.step, 0, 0);
+        const index = Math.floor(this.random.generate() * StageLayer.BONUS_SNOWFLAKE_ASSET_IDS.length);
+        const assetId = StageLayer.BONUS_SNOWFLAKE_ASSET_IDS[index];
+        const score = 200;
+        this.appendSnowFlake(wall.x, Entity.SIZE * y, assetId, score);
     };
 
     private createNextWallData = (levelRate: number, speedRate: number, remainingTime: number, perSec: number): void => {
