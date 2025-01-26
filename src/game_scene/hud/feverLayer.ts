@@ -137,6 +137,8 @@ class Snowflake extends g.Sprite {
             this.opacity *= .7;
             if (this.opacity < 0.1) {
                 if (this.isStop) {
+                    this.opacity = 0;
+                    this.modified();
                     return true;
                 }
                 this.init();
