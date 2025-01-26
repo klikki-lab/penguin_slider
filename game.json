@@ -516,8 +516,8 @@
 		"img_halo": {
 			"type": "image",
 			"path": "image/img_halo.png",
-			"width": 128,
-			"height": 128
+			"width": 160,
+			"height": 160
 		},
 		"feverLayer": {
 			"type": "script",
