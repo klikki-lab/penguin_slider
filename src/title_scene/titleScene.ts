@@ -219,7 +219,7 @@ export class TitleScene extends g.Scene {
             this.hideButtonAll();
         };
         impl2024WinterButton.onUpdate.add(() => {
-            impl2024WinterButton.y = impl2024WinterButtonY + Math.sin(g.game.age / (g.game.fps * 2) * Math.PI) * margin * .5;
+            impl2024WinterButton.y = impl2024WinterButtonY + Math.sin((g.game.age + 5) / (g.game.fps * 2) * Math.PI) * margin * .5;
             impl2024WinterButton.modified();
         });
         layer.append(impl2024WinterButton);
@@ -235,7 +235,7 @@ export class TitleScene extends g.Scene {
             this.hideButtonAll();
         };
         easyModeButton.onUpdate.add(() => {
-            easyModeButton.y = easyModeButtonY + Math.sin(g.game.age / (g.game.fps * 2) * Math.PI) * margin * .5;
+            easyModeButton.y = easyModeButtonY + Math.sin((g.game.age + 10) / (g.game.fps * 2) * Math.PI) * margin * .5;
             easyModeButton.modified();
         });
         layer.append(easyModeButton);
