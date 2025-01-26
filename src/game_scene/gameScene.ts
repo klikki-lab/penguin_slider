@@ -73,7 +73,11 @@ export class GameScene extends g.Scene {
     private blackout: g.Sprite;
     private isPauseGame = false;
 
-    constructor(private param: GameMainParameterObject, private isClicked: boolean, private isEasyMode: boolean, private timeLimit: number) {
+    constructor(
+        private param: GameMainParameterObject,
+        private isClicked: boolean,
+        private isEasyMode: boolean,
+        private timeLimit: number) {
         super({
             game: g.game,
             assetIds: [
@@ -777,25 +781,6 @@ export class GameScene extends g.Scene {
         }
         return false;
     };
-
-    // private surprise = (): void => {
-    //     const surpriseMark = new g.Sprite({
-    //         scene: this,
-    //         src: this.asset.getImageById("img_exclamation_mark"),
-    //         anchorX: .5,
-    //         anchorY: .5,
-    //         x: g.game.width * .3,
-    //         y: g.game.height * .5,
-    //     });
-    //     let life = g.game.fps;
-    //     surpriseMark.onUpdate.add(() => {
-    //         if (life-- <= 0) {
-    //             surpriseMark.destroy();
-    //             return true;
-    //         }
-    //     });
-    //     this.hudLayer.append(surpriseMark);
-    // };
 
     private createHudLayer = (): g.E => {
         this.countdownTimer = new CountdownTimer(this.timeLimit);

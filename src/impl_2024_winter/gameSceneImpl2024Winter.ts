@@ -22,7 +22,7 @@ import { Speedometer } from "../game_scene/hud/speedometer";
 import { TimeLabel } from "../game_scene/hud/timeLabel";
 import { SpeedController } from "../game_scene/speedController";
 import { Snowflake } from "../game_scene/stage/snowflake";
-import { StageLayer } from "./stageLayerImple2024Winter";
+import { StageLayerImple2024Winter } from "./stageLayerImple2024Winter";
 import { Wall } from "../game_scene/stage/wall";
 
 const MusicId = {
@@ -37,7 +37,7 @@ const SoundId = {
     HITTING_HEAD: "se_hitting_head",
 } as const;
 
-export class GameScene extends g.Scene {
+export class GameSceneImple2024Winter extends g.Scene {
 
     private static readonly SMOKE_INTERVAL = Math.floor(g.game.fps / 30 * 6);
     private static readonly FAILED_INTERVAL_TIME = 2000;
@@ -52,7 +52,7 @@ export class GameScene extends g.Scene {
     private backgroundLayer: g.E;
     private clouds: Clouds;
     private driftIces: DriftIces;
-    private stageLayer: StageLayer;
+    private stageLayer: StageLayerImple2024Winter;
     private effectBackLayer: g.E;
     private effectMiddleLayer: g.E;
     private effectFrontLayer: g.E;
@@ -74,7 +74,7 @@ export class GameScene extends g.Scene {
             game: g.game,
             assetIds: [
                 "img_background", "img_distant_star", "img_moon",
-                "img_penguin", "img_penguin_beak", "img_penguin_tail",
+                "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_exclamation_mark",
                 "img_ice_cube", "img_smoke",
                 "img_snowflake_01", "img_snowflake_02", "img_snowflake_03", "img_snowflake_04", "img_snowflake_05",
                 "img_wall", "img_snow_covered_01", "img_snow_covered_02",
@@ -121,7 +121,7 @@ export class GameScene extends g.Scene {
         this.effectBackLayer = new g.E({ scene: this, parent: this });
         this.effectBackLayer.children = [];
 
-        this.stageLayer = new StageLayer(this, this.param.random);
+        this.stageLayer = new StageLayerImple2024Winter(this, this.param.random);
         this.append(this.stageLayer);
 
         this.iceCubes = new g.E({ scene: this, parent: this });
@@ -635,7 +635,7 @@ export class GameScene extends g.Scene {
     };
 
     private createSnowSmoke = (target: g.E, speedRate: number) => {
-        const interval = GameScene.SMOKE_INTERVAL - Math.floor(speedRate * 3);
+        const interval = GameSceneImple2024Winter.SMOKE_INTERVAL - Math.floor(speedRate * 3);
         if (g.game.age % interval === 0) {
             const pos = { x: target.x - target.width / 2, y: target.y + target.height / 2 };
             this.effectBackLayer.append(new SnowSmoke(this, pos));
@@ -682,7 +682,7 @@ export class GameScene extends g.Scene {
         this.blackout.x = g.game.width;
 
         this.timeline.create(this.blackout)
-            .wait(GameScene.FAILED_INTERVAL_TIME)
+            .wait(GameSceneImple2024Winter.FAILED_INTERVAL_TIME)
             .moveX((g.game.width - this.blackout.width) / 2, Blackout.DURATION_TRANSITION)
             .call(() => {
                 this.isPauseGame = true;
@@ -737,7 +737,7 @@ export class GameScene extends g.Scene {
         this.curtainLayer = new g.E({ scene: this, parent: layer });
 
         const fontSize = 40;
-        this.scoreLabel = new ScoreLabel(this, this.bitmapFont, fontSize);
+        this.scoreLabel = new ScoreLabel(this, this.bitmapFont, fontSize, 24);
         this.scoreLabel.x = fontSize / 2;
         this.scoreLabel.y = fontSize / 2;
 

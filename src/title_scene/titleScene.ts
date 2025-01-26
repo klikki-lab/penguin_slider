@@ -10,9 +10,16 @@ import { Penguin } from "../game_scene/entity/penguin";
 import { StageLayer } from "../game_scene/stage/stageLayer";
 import { Wall } from "../game_scene/stage/wall";
 
+export interface TitleSceneParams {
+    isClicked: boolean;
+    isNormalMode: boolean;
+    isEasyMode: boolean;
+    is2024WinterMode: boolean;
+};
+
 export class TitleScene extends g.Scene {
 
-    private _onFinish: (isClicked: boolean, isEasyMode: boolean) => void;
+    private _onFinish: (params: TitleSceneParams) => void;
     private timeline: tl.Timeline;
     private tween: tl.Tween;
     private smokeLayer: g.E;
@@ -20,13 +27,13 @@ export class TitleScene extends g.Scene {
     private penguin: Penguin;
     private iceCubes: g.E;
     private bubble: SpeechBubble;
-    private startButton: Button;
-    private startEasyModeButton: Button;
+    private frontLayer: g.E;
     private holdRepeater: MouseButtonHoldRepeater;
     private prevX = 0;
     private isClicked = false;
     private isClickedStartButton = false;
-    private isClickedStartEasyModeButton = false;
+    private isClickedEasyModeButton = false;
+    private isClickedImpl2024WinterButton = false;
 
     constructor(private timeLimit: number) {
         super({
@@ -35,7 +42,8 @@ export class TitleScene extends g.Scene {
                 "img_blackout", "img_background",
                 "img_title_logo", "img_how_to_play", "img_speech_bubble", "img_msg_here_we_go",
                 "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_exclamation_mark", "img_ice_cube", "img_smoke",
-                "img_wall", "img_snow_covered_01", "img_snow_covered_02", "img_start_button", "img_easy_mode_button",
+                "img_wall", "img_snow_covered_01", "img_snow_covered_02",
+                "img_start_button", "img_easy_mode_button", "img_button_2024_winter_ver",
             ],
         });
 
@@ -49,7 +57,14 @@ export class TitleScene extends g.Scene {
         this.timeline.create(blackout)
             .wait(Blackout.DURATION_TRANSITION)
             .moveX(0, Blackout.DURATION_TRANSITION)
-            .call(() => this._onFinish(this.isClicked, this.isClickedStartEasyModeButton));
+            .call(() => {
+                this._onFinish({
+                    isClicked: this.isClicked,
+                    isNormalMode: this.isClickedStartButton,
+                    isEasyMode: this.isClickedEasyModeButton,
+                    is2024WinterMode: this.isClickedImpl2024WinterButton,
+                })
+            });
     };
 
     private loadHandler = (): void => {
@@ -67,7 +82,7 @@ export class TitleScene extends g.Scene {
         this.iceCubes = new g.E({ scene: this, parent: this.backLayer });
         this.iceCubes.children = [];
         this.backLayer.append(this.penguin = this.crteatePenguin());
-        this.append(this.createFrontLayer());
+        this.append(this.frontLayer = this.createFrontLayer());
 
         this.onPointDownCapture.add(this.pointDownHandler);
         this.onPointUpCapture.add(this.pointUpHandler)
@@ -127,21 +142,15 @@ export class TitleScene extends g.Scene {
 
         if (this.penguin.x > g.game.width + this.penguin.getWidth() * 2) {
             this.finishScene();
-        } else if (!this.isClickedStartButton && !this.isClickedStartEasyModeButton && !this.bubble &&
-            this.penguin.x + this.penguin.width * 1.5 > g.game.width) {
+        } else if (!this.isClickedStartButton && !this.isClickedEasyModeButton && !this.isClickedImpl2024WinterButton &&
+            !this.bubble && this.penguin.x + this.penguin.width * 1.5 > g.game.width) {
             const isUp = this.penguin.y > Penguin.SIZE * 2;
             this.bubble = new SpeechBubble(this, isUp, "img_msg_here_we_go");
             this.bubble.x = this.penguin.x - this.penguin.width;
             this.bubble.y = isUp ? this.penguin.y - this.bubble.height : this.penguin.y + this.bubble.height;
             this.append(this.bubble);
 
-            if (this.startButton.visible()) {
-                this.startButton.hide();
-            }
-
-            if (this.startEasyModeButton.visible()) {
-                this.startEasyModeButton.hide();
-            }
+            this.hideButtonAll();
         } else if (this.bubble) {
             this.bubble.x = Math.min(this.penguin.x - this.penguin.width, g.game.width - this.bubble.width * .6);
             this.bubble.modified();
@@ -163,7 +172,7 @@ export class TitleScene extends g.Scene {
             this.spawnIceCube();
         }
 
-        if (this.isClickedStartButton || this.isClickedStartEasyModeButton) {
+        if (this.isClickedStartButton || this.isClickedEasyModeButton || this.isClickedImpl2024WinterButton) {
             this.penguin.velocity.x *= 1.1;
         }
     };
@@ -185,36 +194,51 @@ export class TitleScene extends g.Scene {
         logo.moveTo(g.game.width / 2, 0);
         howToPlay.moveTo(g.game.width / 2, logo.y + logo.height - margin * 1.5);
 
-        const button = new Button(this, "img_start_button");
-        const buttonY = howToPlay.y + howToPlay.height - button.height / 2 + margin * 2;
-        button.moveTo(g.game.width / 2 + button.width, buttonY);
-        button.opacity = 0;
-        button.onClick = btn => {
+        const startButton = new Button(this, "img_start_button");
+        const buttonY = howToPlay.y + howToPlay.height - startButton.height / 2 + margin * 2;
+        startButton.moveTo(g.game.width / 2 + startButton.width, buttonY);
+        startButton.opacity = 0;
+        startButton.onClick = _ => {
             this.isClickedStartButton = true;
-            btn.hide();
-            this.startEasyModeButton.hide();
+            this.hideButtonAll();
         };
 
-        button.onUpdate.add(() => {
-            button.y = buttonY + Math.sin(g.game.age / (g.game.fps * 2) * Math.PI) * margin * .5;
-            button.modified();
+        startButton.onUpdate.add(() => {
+            startButton.y = buttonY + Math.sin(g.game.age / (g.game.fps * 2) * Math.PI) * margin * .5;
+            startButton.modified();
         });
-        layer.append(this.startButton = button);
+        layer.append(startButton);
 
-        this.startEasyModeButton = new Button(this, "img_easy_mode_button");
-        this.startEasyModeButton.moveTo(g.game.width / 2 - this.startEasyModeButton.width * 2, buttonY);
-        this.startEasyModeButton.opacity = 0;
-        this.startEasyModeButton.onClick = btn => {
-            this.isClickedStartEasyModeButton = true;
-            btn.hide();
-            this.startButton.hide();
+        const impl2024WinterButton = new Button(this, "img_button_2024_winter_ver");
+        impl2024WinterButton.scale(.75);
+        const impl2024WinterButtonY = startButton.y + startButton.height / 2 - impl2024WinterButton.height * impl2024WinterButton.scaleY / 2;
+        impl2024WinterButton.moveTo(margin * 2, impl2024WinterButtonY);
+        impl2024WinterButton.opacity = 0;
+        impl2024WinterButton.onClick = _ => {
+            this.isClickedImpl2024WinterButton = true;
+            this.hideButtonAll();
         };
-        this.startEasyModeButton.onUpdate.add(() => {
-            this.startEasyModeButton.y = buttonY + Math.sin(g.game.age / (g.game.fps * 2) * Math.PI) * margin * .5;
-            this.startEasyModeButton.modified();
+        impl2024WinterButton.onUpdate.add(() => {
+            impl2024WinterButton.y = impl2024WinterButtonY + Math.sin(g.game.age / (g.game.fps * 2) * Math.PI) * margin * .5;
+            impl2024WinterButton.modified();
         });
-        layer.append(this.startEasyModeButton);
+        layer.append(impl2024WinterButton);
 
+        const easyModeButton = new Button(this, "img_easy_mode_button");
+        easyModeButton.scale(.75);
+        const easyModeButtonX = startButton.x - easyModeButton.width * easyModeButton.scaleX * 1.5;
+        const easyModeButtonY = startButton.y + startButton.height / 2 - easyModeButton.height * easyModeButton.scaleY / 2;
+        easyModeButton.moveTo(easyModeButtonX, easyModeButtonY);
+        easyModeButton.opacity = 0;
+        easyModeButton.onClick = _ => {
+            this.isClickedEasyModeButton = true;
+            this.hideButtonAll();
+        };
+        easyModeButton.onUpdate.add(() => {
+            easyModeButton.y = easyModeButtonY + Math.sin(g.game.age / (g.game.fps * 2) * Math.PI) * margin * .5;
+            easyModeButton.modified();
+        });
+        layer.append(easyModeButton);
 
         const duration = 500;
         this.timeline.create(logo)
@@ -225,13 +249,22 @@ export class TitleScene extends g.Scene {
         this.timeline.create(howToPlay)
             .fadeIn(duration, tl.Easing.easeInOutCubic);
 
-        this.timeline.create(button)
+        this.timeline.create(startButton)
             .fadeIn(duration, tl.Easing.easeInOutCubic);
 
-        this.timeline.create(this.startEasyModeButton)
+        this.timeline.create(easyModeButton)
+            .fadeIn(duration, tl.Easing.easeInOutCubic);
+
+        this.timeline.create(impl2024WinterButton)
             .fadeIn(duration, tl.Easing.easeInOutCubic);
 
         return layer;
+    };
+
+    private hideButtonAll = (): void => {
+        this.frontLayer.children?.forEach(e => {
+            if (e instanceof Button && e.visible()) e.hide();
+        });
     };
 
     private createBackLayer = (): g.E => {
@@ -263,5 +296,5 @@ export class TitleScene extends g.Scene {
         });
     }
 
-    set onFinish(callback: (isClicked: boolean, isEasyMode: boolean) => void) { this._onFinish = callback }
+    set onFinish(callback: (params: TitleSceneParams) => void) { this._onFinish = callback }
 }

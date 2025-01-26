@@ -2,7 +2,7 @@ import { Entity } from "../game_scene/entity/entity";
 import { Snowflake } from "../game_scene/stage/snowflake";
 import { Wall } from "../game_scene/stage/wall";
 
-export class StageLayer extends g.E {
+export class StageLayerImple2024Winter extends g.E {
 
     /** 高さ 9 */
     static readonly ROW = Math.floor(g.game.height / Entity.SIZE);
@@ -58,9 +58,9 @@ export class StageLayer extends g.E {
         this.prevSpaceCount = 0;
         this.bonusDuration = 0;
 
-        for (this.step = -1; this.step < StageLayer.COL; this.step++) {
+        for (this.step = -1; this.step < StageLayerImple2024Winter.COL; this.step++) {
             this.appendWall(this.step, 0, 0);
-            const bottom = this.appendWall(this.step, StageLayer.ROW - 1, 0);
+            const bottom = this.appendWall(this.step, StageLayerImple2024Winter.ROW - 1, 0);
             this.appendSnowCovered(bottom);
         }
     };
@@ -71,7 +71,7 @@ export class StageLayer extends g.E {
     };
 
     needNextWall = (cameraX: number): boolean =>
-        Math.floor(cameraX / Entity.SIZE) + StageLayer.COL + 1 > this.step;
+        Math.floor(cameraX / Entity.SIZE) + StageLayerImple2024Winter.COL + 1 > this.step;
 
     /**
      * @param levelRate 0 から 1 までの値
@@ -110,7 +110,7 @@ export class StageLayer extends g.E {
                 this.append(wall);
             }
 
-            this.appendSnowCovered(this.appendWall(this.step, StageLayer.ROW - 1, 0));
+            this.appendSnowCovered(this.appendWall(this.step, StageLayerImple2024Winter.ROW - 1, 0));
             this.step++;
             this.endStep++;
             return;
@@ -119,18 +119,18 @@ export class StageLayer extends g.E {
         if (this.wallDuration > 0) {
             let snowflakeIndex = 0;
             let height = 0;
-            while (height < StageLayer.ROW) {
+            while (height < StageLayerImple2024Winter.ROW) {
                 let index = 0;
-                while (height + index < StageLayer.ROW && (this.wall >>> (StageLayer.ROW - 1 - (height + index))) & 1) {
+                while (height + index < StageLayerImple2024Winter.ROW && (this.wall >>> (StageLayerImple2024Winter.ROW - 1 - (height + index))) & 1) {
                     index++;
                 }
                 if (index > 0) {
                     const wall = this.appendWall(this.step, height, index - 1);
                     if (height > 0) {
                         this.appendSnowCovered(wall);
-                        if (height < StageLayer.ROW - 1) {
-                            const index = StageLayer.SNOWFLAKE_INDEX[snowflakeIndex++];
-                            const assetId = StageLayer.SNOWFLAKE_ASSET_IDS[index];
+                        if (height < StageLayerImple2024Winter.ROW - 1) {
+                            const index = StageLayerImple2024Winter.SNOWFLAKE_INDEX[snowflakeIndex++];
+                            const assetId = StageLayerImple2024Winter.SNOWFLAKE_ASSET_IDS[index];
                             const score = index * 200 + 100;
                             this.appendSnowFlake(wall.x, wall.y - wall.height / 2, assetId, score);
                         }
@@ -144,9 +144,9 @@ export class StageLayer extends g.E {
             this.bonusDuration--;
             const wall = this.appendWall(this.step, 0, 0);
             if (this.step - this.startBonusStep > 2 && this.bonusDuration > 2) {
-                for (let i = 3; i < StageLayer.ROW - 1; i++) {
-                    const index = Math.floor(this.random.generate() * StageLayer.BONUS_SNOWFLAKE_ASSET_IDS.length);
-                    const assetId = StageLayer.BONUS_SNOWFLAKE_ASSET_IDS[index];
+                for (let i = 3; i < StageLayerImple2024Winter.ROW - 1; i++) {
+                    const index = Math.floor(this.random.generate() * StageLayerImple2024Winter.BONUS_SNOWFLAKE_ASSET_IDS.length);
+                    const assetId = StageLayerImple2024Winter.BONUS_SNOWFLAKE_ASSET_IDS[index];
                     const score = 200;
                     this.appendSnowFlake(wall.x, Entity.SIZE * i, assetId, score);
                 }
@@ -157,48 +157,48 @@ export class StageLayer extends g.E {
             }
         } else {
             this.appendWall(this.step, 0, 0);
-            const bottom = this.appendWall(this.step, StageLayer.ROW - 1, 0);
+            const bottom = this.appendWall(this.step, StageLayerImple2024Winter.ROW - 1, 0);
             this.appendSnowCovered(bottom);
         }
         this.step++;
     };
 
     private createNextWallData = (levelRate: number, speedRate: number, remainingTime: number, perSec: number): void => {
-        for (let i = StageLayer.SNOWFLAKE_INDEX.length - 1; i >= 0; i--) {
+        for (let i = StageLayerImple2024Winter.SNOWFLAKE_INDEX.length - 1; i >= 0; i--) {
             const j = Math.floor(this.random.generate() * (i + 1));
-            const temp = StageLayer.SNOWFLAKE_INDEX[i];
-            StageLayer.SNOWFLAKE_INDEX[i] = StageLayer.SNOWFLAKE_INDEX[j];
-            StageLayer.SNOWFLAKE_INDEX[j] = temp;
+            const temp = StageLayerImple2024Winter.SNOWFLAKE_INDEX[i];
+            StageLayerImple2024Winter.SNOWFLAKE_INDEX[i] = StageLayerImple2024Winter.SNOWFLAKE_INDEX[j];
+            StageLayerImple2024Winter.SNOWFLAKE_INDEX[j] = temp;
         }
 
         const penguinOffsetX = 3;
-        const arrivalTime = (StageLayer.COL - penguinOffsetX) / perSec; // ペンギンが壁（右端）に到達する時間
+        const arrivalTime = (StageLayerImple2024Winter.COL - penguinOffsetX) / perSec; // ペンギンが壁（右端）に到達する時間
         if (remainingTime <= arrivalTime) { // 今から壁を作ってもペンギンまで到達しない可能性が高い場合
             this.wallDuration = 0;
         } else {
             if (remainingTime <= arrivalTime * 1.8) {// 残り時間が少ない場合は残りは壁にする
                 const addWidth = (remainingTime - arrivalTime) * perSec;
-                this.wallDuration = Math.max(StageLayer.MIN_WALL_WIDTH, Math.floor(addWidth * (2 - speedRate)));
+                this.wallDuration = Math.max(StageLayerImple2024Winter.MIN_WALL_WIDTH, Math.floor(addWidth * (2 - speedRate)));
             } else {
-                const col = StageLayer.COL / 2;
-                this.wallDuration = Math.floor(this.random.generate() * col) + StageLayer.MIN_WALL_WIDTH;
+                const col = StageLayerImple2024Winter.COL / 2;
+                this.wallDuration = Math.floor(this.random.generate() * col) + StageLayerImple2024Winter.MIN_WALL_WIDTH;
             }
         }
         this._snowFlakeCount += this.wallDuration;
         this.startWall = this.wallDuration;
 
-        const level = Math.floor((StageLayer.LEVEL_MIN_OFFSETS.length - 1) * levelRate);
-        const min = StageLayer.LEVEL_MIN_OFFSETS[level];
+        const level = Math.floor((StageLayerImple2024Winter.LEVEL_MIN_OFFSETS.length - 1) * levelRate);
+        const min = StageLayerImple2024Winter.LEVEL_MIN_OFFSETS[level];
         const wallData = this.fixWallData(min, this.prevSpaceCount);
         this.wall = wallData.data;
         this.prevSpaceCount = this.countSpace(wallData.data, wallData.topFloor);
 
         if (wallData.topFloor >= 3 && (this.wall & 0x3) === 0x1 && this.random.generate() < .3) {
-            this.wall &= StageLayer.PITFALL_MASK;
+            this.wall &= StageLayerImple2024Winter.PITFALL_MASK;
         }
 
         const interval = Math.floor(wallData.topFloor + perSec / 2 + this.random.generate() * (perSec / 2));
-        this.interval = Math.max(StageLayer.MIN_INTERVAL, interval);
+        this.interval = Math.max(StageLayerImple2024Winter.MIN_INTERVAL, interval);
     };
 
     /**
@@ -208,7 +208,7 @@ export class StageLayer extends g.E {
      */
     private fixWallData = (src: number, prevSpaceCount: number): { data: number, topFloor: number } => {
         const newData = Math.floor(this.random.generate() * (0xFF - src)) + src;
-        const masked = Math.floor(this.random.generate() * newData) | StageLayer.EDGES_MASK;
+        const masked = Math.floor(this.random.generate() * newData) | StageLayerImple2024Winter.EDGES_MASK;
         const topFloor = this.findTopFloor(masked);
         // 生成した壁データの最上階が1未満、または前回の壁の通路（スペース）数未満の場合** は壁データを再生成する
         // ** 前回、最上階の通路を通過している可能性が常にあるので、以下を想定し、最善の行動（最低限のアイスキューブしかない状態）
@@ -229,7 +229,7 @@ export class StageLayer extends g.E {
      */
     private findTopFloor = (src: number): number => {
         // 9bit目は天井なので省略し、床は0b01になっていればいいので6bit右シフトした7bit以下を順次チェック
-        const offset = StageLayer.ROW - 3;// 6
+        const offset = StageLayerImple2024Winter.ROW - 3;// 6
         let i = 0;
         while (i < offset) {
             const index = offset - i;
@@ -258,7 +258,7 @@ export class StageLayer extends g.E {
         const edgeEnd = this.wallDuration === 1;
         const edgeStart = this.wallDuration === this.startWall;
         const edgeIndex = ((y === 0 && index >= 1) ||
-            (y > 0 && y + index < StageLayer.ROW - 1)) && (edgeEnd || edgeStart) ? 1 : 0;
+            (y > 0 && y + index < StageLayerImple2024Winter.ROW - 1)) && (edgeEnd || edgeStart) ? 1 : 0;
         const wall = new Wall(this.scene, index, edgeIndex);
         wall.moveTo(x * wall.width + wall.width / 2, y * wall.width + wall.height / 2);
         if (edgeEnd) {
