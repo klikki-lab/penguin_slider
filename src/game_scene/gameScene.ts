@@ -25,6 +25,7 @@ import { Snowflake } from "./stage/snowflake";
 import { StageLayer } from "./stage/stageLayer";
 import { Wall } from "./stage/wall";
 import { SnowflakeStorage } from "./hud/snowflakeStorage";
+import { FeverLayer } from "./hud/feverLayer";
 
 const MusicId = {
     BGM: "bgm_nc366054",
@@ -64,6 +65,7 @@ export class GameScene extends g.Scene {
     private timeLabel: TimeLabel;
     private speedometer: Speedometer;
     private snowflakeStorage: SnowflakeStorage;
+    private feverLayer: FeverLayer;
     private bitmapFont: g.BitmapFont;
     private audioController: AudioController;
     private holdRepeater: MouseButtonHoldRepeater;
@@ -81,7 +83,7 @@ export class GameScene extends g.Scene {
                 "img_snowflake_01", "img_snowflake_02", "img_snowflake_03", "img_snowflake_04", "img_snowflake_05",
                 "img_wall", "img_snow_covered_01", "img_snow_covered_02",
                 "img_crush", "img_splash", "img_speedometer", "img_speedometer_needle",
-                "img_cloud", "img_drift_ice",
+                "img_cloud", "img_drift_ice", "img_halo",
                 "img_blackout", "img_start", "img_finish", "img_snow", "img_pause_message",
                 "img_speech_bubble", "img_msg_omg", "img_msg_amazing", "img_msg_superb",
                 "img_msg_excellent", "img_msg_nice", "img_msg_good", "img_msg_thanks",
@@ -126,7 +128,10 @@ export class GameScene extends g.Scene {
 
         this.stageLayer = new StageLayer(this, this.param.random);
         this.stageLayer.onFinishBonusTime = isSurprise => {
-            if (!isSurprise) this.snowflakeStorage.release();
+            if (!isSurprise) {
+                this.snowflakeStorage.release();
+                this.feverLayer.stop();
+            }
         };
         this.stageLayer.onSurprise = () => this.penguin.surprise();
         this.append(this.stageLayer);
@@ -248,6 +253,7 @@ export class GameScene extends g.Scene {
         this.penguin.init();
         this.stageLayer.init();
         this.snowflakeStorage.init();
+        this.feverLayer.init();
         this.clouds.init();
         this.driftIces.init();
         this.holdRepeater.init(false);
@@ -268,9 +274,10 @@ export class GameScene extends g.Scene {
     private finishGame = (): void => {
         if (this.blackout) return;
 
-        if (this.snowflakeStorage.isFull()) {
-            this.snowflakeStorage.release();
-        }
+        // if (this.snowflakeStorage.isFull()) {
+        //     this.snowflakeStorage.release();
+        //     this.feverLayer.stop();
+        // }
         this.stageLayer.finish();
         const duration = 500;
         if (!this.speechBubbleTween) {
@@ -337,6 +344,12 @@ export class GameScene extends g.Scene {
     private createSpeechBubbleTimeline = (bubble: g.E, duration: number): tl.Tween => this.timeline.create(bubble)
         .wait(duration * 3)
         .fadeIn(duration, tl.Easing.easeOutQuint)
+        .call(() => {
+            if (this.snowflakeStorage.isFull()) {
+                this.snowflakeStorage.release();
+                this.feverLayer.stop();
+            }
+        })
         .wait(duration * 8)
         .call(() => {
             bubble.destroy();
@@ -352,22 +365,26 @@ export class GameScene extends g.Scene {
 
     private calcResultMessage = () => {
         const collectRate = this.penguin.collectedSnowFlake / (this.stageLayer.snowflakeCount + 1);
+        const collectRareRate = this.penguin.collectedRareSnowFlake / (this.stageLayer.rareSnowflakeCount + 1);
         // console.log(`missCount: ${this.penguin.missCount}` +
         //     ` ,collectRate: ${collectRate}` +
         //     ` ,collected: ${this.penguin.collectedSnowFlake}` +
-        //     ` ,count: ${this.stageLayer.snowFlakeCount}`);
+        //     ` ,snowflakeCount: ${this.stageLayer.snowflakeCount}` +
+        //     ` ,collectedRare: ${this.penguin.collectedRareSnowFlake}` +
+        //     ` ,rareSnowflakeCount: ${this.stageLayer.rareSnowflakeCount}`);
 
         if (this.scoreLabel.isCounterStop()) return "img_msg_omg";
         if (this.penguin.isNoMiss()) {
-            const isPerfect = this.penguin.collectedRareSnowFlake === this.stageLayer.rareSnowflakeCount;
-            if (collectRate >= 1.0 && isPerfect) return "img_msg_amazing";
+            if (collectRate >= 1.0 && collectRareRate >= 0.9) return "img_msg_amazing";
             if (collectRate >= 1.0) return "img_msg_superb";
             if (collectRate >= 0.9) return "img_msg_excellent";
             if (collectRate >= 0.8) return "img_msg_nice";
             if (collectRate >= 0.7) return "img_msg_good";
         }
         const missCount = this.penguin.missCount;
-        if (missCount <= 1 && collectRate >= 1.0) return "img_msg_excellent";
+        if (missCount <= 1) {
+            if (collectRate >= 1.0 && collectRareRate >= 0.9) return "img_msg_excellent";
+        }
         if (collectRate >= 0.8) return "img_msg_nice";
         if (collectRate >= 0.6) return "img_msg_good";
         return "img_msg_thanks";
@@ -455,7 +472,7 @@ export class GameScene extends g.Scene {
             const remainingTime = this.countdownTimer.remainingTime;
             const levelRate = 1 - remainingTime / this.timeLimit;
             const perSec = this.speedController.getPerSec();
-            const ratio = this.snowflakeStorage.ratio();
+            const ratio = this.snowflakeStorage.rate();
             this.stageLayer.create(levelRate, speedRate, remainingTime, perSec, ratio);
         }
     };
@@ -509,6 +526,9 @@ export class GameScene extends g.Scene {
                                 this.penguin.obtainSnowFlake(snowflake.score === 300);
                                 const count = snowflake.score <= 200 ? 1 : this.isEasyMode ? 2 : 3;
                                 this.snowflakeStorage.add(count);
+                                if (this.snowflakeStorage.isFull() && !this.feverLayer.isStart) {
+                                    this.feverLayer.start();
+                                }
 
                                 this.scoreLabel.addScore(snowflake.score);
                                 new SplashFragments(this, this.effectMiddleLayer, snowflake);
@@ -758,6 +778,25 @@ export class GameScene extends g.Scene {
         return false;
     };
 
+    // private surprise = (): void => {
+    //     const surpriseMark = new g.Sprite({
+    //         scene: this,
+    //         src: this.asset.getImageById("img_exclamation_mark"),
+    //         anchorX: .5,
+    //         anchorY: .5,
+    //         x: g.game.width * .3,
+    //         y: g.game.height * .5,
+    //     });
+    //     let life = g.game.fps;
+    //     surpriseMark.onUpdate.add(() => {
+    //         if (life-- <= 0) {
+    //             surpriseMark.destroy();
+    //             return true;
+    //         }
+    //     });
+    //     this.hudLayer.append(surpriseMark);
+    // };
+
     private createHudLayer = (): g.E => {
         this.countdownTimer = new CountdownTimer(this.timeLimit);
         this.countdownTimer.onTick = remainingSec => this.timeLabel.setTime(remainingSec);
@@ -776,6 +815,8 @@ export class GameScene extends g.Scene {
         this.snowflakeStorage.x = this.scoreLabel.x + this.scoreLabel.width + this.snowflakeStorage.width * 1.25;
         this.snowflakeStorage.y = this.scoreLabel.y + this.scoreLabel.height / 2;
 
+        this.feverLayer = new FeverLayer(this, this.snowflakeStorage);
+
         this.speedometer = new Speedometer(this);
         this.speedometer.x = this.snowflakeStorage.x + this.snowflakeStorage.width + this.speedometer.width * .75;
         this.speedometer.y = this.speedometer.height / 2;
@@ -787,6 +828,7 @@ export class GameScene extends g.Scene {
         layer.append(this.scoreLabel);
         layer.append(this.timeLabel);
         layer.append(this.speedometer);
+        layer.append(this.feverLayer);
         layer.append(this.snowflakeStorage);
         return layer;
     };
