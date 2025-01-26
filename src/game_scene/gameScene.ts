@@ -101,7 +101,7 @@ export class GameScene extends g.Scene {
 
     private loadHandler = (): void => {
         this.holdRepeater = new MouseButtonHoldRepeater();
-        this.speedController = new SpeedController(this.isEasyMode ? { limit: 0.1 } : {});
+        this.speedController = new SpeedController(this.isEasyMode ? { limit: 0.01 } : {});
 
         this.audioController = new AudioController(0.2, 0.1);
         const sounds = [
