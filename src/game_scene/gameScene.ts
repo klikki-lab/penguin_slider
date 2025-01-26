@@ -523,7 +523,7 @@ export class GameScene extends g.Scene {
                             if (snowflake instanceof Snowflake && !snowflake.isObtained) {
                                 this.audioController.playSE(SoundId.OBTAIN);
                                 snowflake.obtain();
-                                this.penguin.obtainSnowFlake(snowflake.score === 300);
+                                this.penguin.obtainSnowflake(snowflake.score === 300);
                                 const count = snowflake.score <= 200 ? 1 : this.isEasyMode ? 2 : 3;
                                 this.snowflakeStorage.add(count);
                                 if (this.snowflakeStorage.isFull() && !this.feverLayer.isStart) {
