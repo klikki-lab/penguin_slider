@@ -34,7 +34,7 @@ export class TitleScene extends g.Scene {
             assetIds: [
                 "img_blackout", "img_background",
                 "img_title_logo", "img_how_to_play", "img_speech_bubble", "img_msg_here_we_go",
-                "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_ice_cube", "img_smoke",
+                "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_exclamation_mark", "img_ice_cube", "img_smoke",
                 "img_wall", "img_snow_covered_01", "img_snow_covered_02", "img_start_button", "img_easy_mode_button",
             ],
         });
