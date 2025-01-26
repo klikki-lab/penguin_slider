@@ -523,6 +523,22 @@
 			"type": "script",
 			"path": "script/game_scene/hud/feverLayer.js",
 			"global": true
+		},
+		"img_button_2024_winter_ver": {
+			"type": "image",
+			"path": "image/img_button_2024_winter_ver.png",
+			"width": 526,
+			"height": 105
+		},
+		"gameSceneImpl2024Winter": {
+			"type": "script",
+			"path": "script/impl_2024_winter/gameSceneImpl2024Winter.js",
+			"global": true
+		},
+		"stageLayerImple2024Winter": {
+			"type": "script",
+			"path": "script/impl_2024_winter/stageLayerImple2024Winter.js",
+			"global": true
 		}
 	},
 	"moduleMainScripts": {
