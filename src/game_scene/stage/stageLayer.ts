@@ -117,7 +117,7 @@ export class StageLayer extends g.E {
                             this.startBonusArea(Math.floor(this.random.generate() * perSec + perSec * 2));
                         } else {
                             if (levelRate > 0.6 && levelRate < 0.9 && storageRate < .75 &&
-                                this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 4)) {
+                                this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 2)) {
                                 this.startBonusArea(Math.floor(this.random.generate() * perSec + perSec * 2));
                                 this.isSurpriseBonus = true;
                                 this.supriseBonusPattern = Math.floor(this.random.generate() * Object.keys(SupriseBonusPattern).length);
@@ -318,7 +318,7 @@ export class StageLayer extends g.E {
         }
         if (passableFloors.length <= 1) {
             if (floors.length === 2) {
-                if (this.random.generate() < .5) {
+                if (this.random.generate() < .33) {
                     StageLayer.SNOWFLAKE_INDEX[0] = 0;
                 }
             } else if (floors.length === 1) {
