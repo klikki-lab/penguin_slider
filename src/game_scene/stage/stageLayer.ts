@@ -6,6 +6,7 @@ const SupriseBonusPattern = {
     CHECKBOARD: 0,
     LATTICE: 1,
     WAVE: 2,
+    WAVE_REVERSE: 3,
     // VERTICAL: 3,
     // HORIZONTAL: 4,
 } as const;
@@ -114,11 +115,11 @@ export class StageLayer extends g.E {
 
                     if (this.wallDuration === 0 && this.step - this.endBonusStep > StageLayer.COL) {
                         if (storageRate >= 1) {
-                            this.startBonusArea(Math.floor(this.random.generate() * perSec + perSec * 2));
+                            this.startBonusArea(Math.floor(this.random.generate() * perSec * 1.5 + perSec * 2));
                         } else {
-                            if (levelRate > 0.6 && levelRate < 0.9 && storageRate < .75 &&
+                            if (levelRate > 0.55 && levelRate < 0.92 && storageRate < .8 && //// 33s ～ 55.2s
                                 this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 2)) {
-                                this.startBonusArea(Math.floor(this.random.generate() * perSec + perSec * 2));
+                                this.startBonusArea(Math.floor(this.random.generate() * perSec * 1.5 + perSec * 2));
                                 this.isSurpriseBonus = true;
                                 this.supriseBonusPattern = Math.floor(this.random.generate() * Object.keys(SupriseBonusPattern).length);
                                 this._onSurprise();
@@ -212,11 +213,13 @@ export class StageLayer extends g.E {
                             }
                             break;
                         case SupriseBonusPattern.WAVE:
+                        case SupriseBonusPattern.WAVE_REVERSE:
                             const height = maxY - offsetY;
                             for (let i = offsetY; i < maxY; i++) {
                                 const waveY = ((Math.sin(stepIndex / 2) + 1) * (height / 2)) + offsetY;
                                 if (Math.abs(waveY - i) < 2) {
-                                    this.appendBonusSnowflake(i);
+                                    const isReverse = this.supriseBonusPattern === SupriseBonusPattern.WAVE_REVERSE;
+                                    this.appendBonusSnowflake(isReverse ? (StageLayer.ROW + 1) - i : i);
                                     snowfrakeCount++;
                                 }
                             }
