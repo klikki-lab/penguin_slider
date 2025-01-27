@@ -101,7 +101,8 @@ export class GameScene extends g.Scene {
 
     private loadHandler = (): void => {
         this.holdRepeater = new MouseButtonHoldRepeater();
-        this.speedController = new SpeedController(this.isEasyMode ? { firstlimit: 1, secondlimit: 1, thirdlimit: .1 } : {});
+        this.speedController = new SpeedController(this.isEasyMode ?
+            { firstlimit: 1, secondlimit: 1, thirdlimit: .1 } : {});
 
         this.audioController = new AudioController(0.2, 0.1);
         const sounds = [
@@ -405,8 +406,7 @@ export class GameScene extends g.Scene {
             const speedRate = this.speedController.getSpeedRate();
             const velocity = this.speedController.getVelocity();
             this.speedometer.value = this.speedController.getSpeedRate();
-            let needSnowSmoke = false;
-
+            let prevX = this.penguin.x;
             for (let i = 0; i < velocity.x; i++) {
                 if (this.penguin.x - this.penguin.getWidth() < this.camera.x + g.game.width) {
                     const bottom = this.collideBottom(this.penguin, 1);
@@ -419,8 +419,9 @@ export class GameScene extends g.Scene {
                     this.penguin.x += 1;
                     this.penguin.modified();
 
-                    if (!needSnowSmoke && (this.collideBottom(this.penguin, 1) instanceof Wall)) {
-                        needSnowSmoke = true;
+                    const distance = prevX + this.penguin.width * .2;
+                    if (this.penguin.x > distance && (this.collideBottom(this.penguin, 1) instanceof Wall)) {
+                        prevX = this.penguin.x;
                         this.createSnowSmoke(this.penguin, speedRate);
                     }
                 }
@@ -428,13 +429,15 @@ export class GameScene extends g.Scene {
 
             for (const iceCube of this.iceCubes.children) {
                 if (!(iceCube instanceof IceCube) || !iceCube) continue;
-                let needSnowSmoke = false;
+                let prevX = iceCube.x;
                 for (let i = 0; i < velocity.x; i++) {
                     if (iceCube.x - iceCube.getWidth() / 2 < this.camera.x + g.game.width) {
                         iceCube.x += 1;
                         iceCube.modified();
-                        if (!needSnowSmoke && (this.collideBottom(iceCube, 1) instanceof Wall)) {
-                            needSnowSmoke = true;
+
+                        const distance = prevX + iceCube.width * .2;
+                        if (iceCube.x > distance && (this.collideBottom(iceCube, 1) instanceof Wall)) {
+                            prevX = iceCube.x;
                             this.createSnowSmoke(iceCube, speedRate);
                         }
                     }
