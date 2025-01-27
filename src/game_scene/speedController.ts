@@ -6,7 +6,9 @@ interface Params {
     thirdFrame?: number;
     minAcc?: number;
     maxAcc?: number;
-    limit?: number;
+    firstlimit?: number;
+    secondlimit?: number;
+    thirdlimit?: number;
 }
 
 export class SpeedController {
@@ -26,15 +28,19 @@ export class SpeedController {
     private firstStep = 0;
     private secondStep = 0;
     private thirdStep = 0;
-    private limit = 0;
+    private firstlimit = 0;
+    private secondlimit = 0;
+    private thirdlimit = 0;
 
-    constructor(params: Params) {
+    constructor(params: Params = {}) {
         this.firstFrame = params.firstFrame || SpeedController.FIRST_FRAME;
         this.secondFrame = params.secondFrame || SpeedController.SECOND_FRAME;
         this.thirdFrame = params.thirdFrame || SpeedController.THIRD_FRAME;
         this.minAcc = params.minAcc || SpeedController.MIN_ACCELERATION;
         this.maxAcc = params.maxAcc || SpeedController.MAX_ACCELERATION;
-        this.limit = params.limit || 1;
+        this.firstlimit = params.firstlimit || 1;
+        this.secondlimit = params.secondlimit || 1;
+        this.thirdlimit = params.thirdlimit || 1;
     }
 
     init = (): void => {
@@ -44,11 +50,11 @@ export class SpeedController {
     };
 
     update = (): void => {
-        if (this.firstStep < this.firstFrame) {
+        if (this.firstStep < this.firstFrame * this.firstlimit) {
             this.firstStep++;
-        } else if (this.secondStep < this.secondFrame) {
+        } else if (this.secondStep < this.secondFrame * this.secondlimit) {
             this.secondStep++;
-        } else if (this.thirdStep < this.thirdFrame * this.limit) {
+        } else if (this.thirdStep < this.thirdFrame * this.thirdlimit) {
             this.thirdStep++;
         }
     }

@@ -92,7 +92,7 @@ export class GameSceneImple2024Winter extends g.Scene {
 
     private loadHandler = (): void => {
         this.holdRepeater = new MouseButtonHoldRepeater();
-        this.speedController = new SpeedController({});
+        this.speedController = new SpeedController();
 
         this.audioController = new AudioController(0.2, 0.1);
         const sounds = [
