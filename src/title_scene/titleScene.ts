@@ -39,9 +39,9 @@ export class TitleScene extends g.Scene {
         super({
             game: g.game,
             assetIds: [
-                "img_blackout", "img_background",
+                "img_blackout", "img_background", "img_background_sea",
                 "img_title_logo", "img_how_to_play", "img_speech_bubble", "img_msg_here_we_go",
-                "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_exclamation_mark", "img_ice_cube", "img_smoke",
+                "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_ice_cube", "img_smoke",
                 "img_wall", "img_snow_covered_01", "img_snow_covered_02",
                 "img_start_button", "img_easy_mode_button", "img_button_2024_winter_ver",
             ],
@@ -77,6 +77,9 @@ export class TitleScene extends g.Scene {
         this.timeline = new tl.Timeline(this);
 
         this.append(this.createSprite("img_background", this));
+        const sea = this.createSprite("img_background_sea", this);
+        sea.y = g.game.height - sea.height;
+        this.append(sea);
         this.append(this.smokeLayer = new g.E({ scene: this }));
         this.append(this.backLayer = this.createBackLayer());
         this.iceCubes = new g.E({ scene: this, parent: this.backLayer });
@@ -145,7 +148,8 @@ export class TitleScene extends g.Scene {
         } else if (!this.isClickedStartButton && !this.isClickedEasyModeButton && !this.isClickedImpl2024WinterButton &&
             !this.bubble && this.penguin.x + this.penguin.width * 1.5 > g.game.width) {
             const isUp = this.penguin.y > Penguin.SIZE * 2;
-            this.bubble = new SpeechBubble(this, isUp, "img_msg_here_we_go");
+            this.bubble = new SpeechBubble(this, isUp);
+            this.bubble.addMessage("img_msg_here_we_go");
             this.bubble.x = this.penguin.x - this.penguin.width;
             this.bubble.y = isUp ? this.penguin.y - this.bubble.height : this.penguin.y + this.bubble.height;
             this.append(this.bubble);
@@ -212,21 +216,21 @@ export class TitleScene extends g.Scene {
         const impl2024WinterButton = new Button(this, "img_button_2024_winter_ver");
         impl2024WinterButton.scale(.75);
         const impl2024WinterButtonY = startButton.y + startButton.height / 2 - impl2024WinterButton.height * impl2024WinterButton.scaleY / 2;
-        impl2024WinterButton.moveTo(margin * 2, impl2024WinterButtonY);
+        impl2024WinterButton.moveTo(impl2024WinterButton.width * impl2024WinterButton.scaleX * .5, impl2024WinterButtonY);
         impl2024WinterButton.opacity = 0;
         impl2024WinterButton.onClick = _ => {
             this.isClickedImpl2024WinterButton = true;
             this.hideButtonAll();
         };
         impl2024WinterButton.onUpdate.add(() => {
-            impl2024WinterButton.y = impl2024WinterButtonY + Math.sin((g.game.age + 5) / (g.game.fps * 2) * Math.PI) * margin * .5;
+            impl2024WinterButton.y = impl2024WinterButtonY + Math.sin(g.game.age / (g.game.fps * 4) * Math.PI) * margin * .5;
             impl2024WinterButton.modified();
         });
         layer.append(impl2024WinterButton);
 
         const easyModeButton = new Button(this, "img_easy_mode_button");
-        easyModeButton.scale(.75);
-        const easyModeButtonX = startButton.x - easyModeButton.width * easyModeButton.scaleX * 1.5;
+        // easyModeButton.scale(.75);
+        const easyModeButtonX = startButton.x - easyModeButton.width * easyModeButton.scaleX * 1.25;
         const easyModeButtonY = startButton.y + startButton.height / 2 - easyModeButton.height * easyModeButton.scaleY / 2;
         easyModeButton.moveTo(easyModeButtonX, easyModeButtonY);
         easyModeButton.opacity = 0;
@@ -235,7 +239,7 @@ export class TitleScene extends g.Scene {
             this.hideButtonAll();
         };
         easyModeButton.onUpdate.add(() => {
-            easyModeButton.y = easyModeButtonY + Math.sin((g.game.age + 10) / (g.game.fps * 2) * Math.PI) * margin * .5;
+            easyModeButton.y = easyModeButtonY + Math.sin(g.game.age / (g.game.fps * 3) * Math.PI) * margin * .5;
             easyModeButton.modified();
         });
         layer.append(easyModeButton);
