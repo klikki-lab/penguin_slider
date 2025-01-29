@@ -15,17 +15,18 @@ import { SpawnSmoke } from "./effect/spawnSmoke";
 import { SpeechBubble } from "./effect/speechBubble";
 import { Splash } from "./effect/splash";
 import { SplashFragments } from "./effect/splashFragments";
+import { SurprisePenguin } from "./effect/surprisePenguin";
 import { IceCube } from "./entity/ice_cube";
 import { Penguin } from "./entity/penguin";
+import { FeverLayer } from "./hud/feverLayer";
 import { ScoreLabel } from "./hud/scoreLabel";
+import { SnowflakeStorage } from "./hud/snowflakeStorage";
 import { Speedometer } from "./hud/speedometer";
 import { TimeLabel } from "./hud/timeLabel";
 import { SpeedController } from "./speedController";
 import { Snowflake } from "./stage/snowflake";
 import { StageLayer } from "./stage/stageLayer";
 import { Wall } from "./stage/wall";
-import { SnowflakeStorage } from "./hud/snowflakeStorage";
-import { FeverLayer } from "./hud/feverLayer";
 
 const MusicId = {
     BGM: "bgm_nc366054",
@@ -37,6 +38,8 @@ const SoundId = {
     SPLASH: "se_splash",
     CRUSH: "se_crush",
     HITTING_HEAD: "se_hitting_head",
+    SURPRISE: "se_surprise",
+    FULL: "se_full",
 } as const;
 
 export class GameScene extends g.Scene {
@@ -52,6 +55,7 @@ export class GameScene extends g.Scene {
     private iceCubes: g.E;
     private speedController: SpeedController;
     private backgroundLayer: g.E;
+    private surprisePenguin: SurprisePenguin;
     private clouds: Clouds;
     private driftIces: DriftIces;
     private stageLayer: StageLayer;
@@ -81,9 +85,9 @@ export class GameScene extends g.Scene {
         super({
             game: g.game,
             assetIds: [
-                "img_background", "img_distant_star", "img_moon",
-                "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_exclamation_mark",
-                "img_ice_cube", "img_smoke",
+                "img_background", "img_background_sea", "img_distant_star", "img_moon",
+                "img_penguin", "img_penguin_beak", "img_penguin_tail",
+                "img_ice_cube", "img_smoke", "img_yellow_penguin", "img_yellow_penguin_tail",
                 "img_snowflake_01", "img_snowflake_02", "img_snowflake_03", "img_snowflake_04", "img_snowflake_05",
                 "img_wall", "img_snow_covered_01", "img_snow_covered_02",
                 "img_crush", "img_splash", "img_speedometer", "img_speedometer_needle",
@@ -92,7 +96,7 @@ export class GameScene extends g.Scene {
                 "img_speech_bubble", "img_msg_omg", "img_msg_amazing", "img_msg_superb",
                 "img_msg_excellent", "img_msg_nice", "img_msg_good", "img_msg_thanks",
                 "img_font", "font_glyphs",
-                "se_splash", "se_spawn_ice_cube", "se_obtain", "se_crush", "se_hitting_head", MusicId.BGM,
+                "se_splash", "se_spawn_ice_cube", "se_obtain", "se_crush", "se_hitting_head", "se_surprise", "se_full", MusicId.BGM,
             ],
         });
 
@@ -111,6 +115,8 @@ export class GameScene extends g.Scene {
             { assetId: SoundId.OBTAIN },
             { assetId: SoundId.CRUSH },
             { assetId: SoundId.HITTING_HEAD },
+            { assetId: SoundId.SURPRISE, volumeRate: 0.5 },
+            { assetId: SoundId.FULL },
         ];
         this.audioController.addSE(this.asset, sounds);
         this.audioController.addMusic(this.asset, [{ assetId: MusicId.BGM }]);
@@ -138,7 +144,10 @@ export class GameScene extends g.Scene {
                 this.feverLayer.stop();
             }
         };
-        this.stageLayer.onSurprise = () => this.penguin.surprise();
+        this.stageLayer.onSurprise = () => {
+            this.audioController.playSE(SoundId.SURPRISE);
+            this.surprisePenguin.start();
+        };
         this.append(this.stageLayer);
 
         this.iceCubes = new g.E({ scene: this, parent: this });
@@ -262,6 +271,7 @@ export class GameScene extends g.Scene {
         this.clouds.init();
         this.driftIces.init();
         this.holdRepeater.init(false);
+        this.surprisePenguin.init();
 
         const clearChildren = (e: g.E): void => {
             const children = e.children;
@@ -279,10 +289,6 @@ export class GameScene extends g.Scene {
     private finishGame = (): void => {
         if (this.blackout) return;
 
-        // if (this.snowflakeStorage.isFull()) {
-        //     this.snowflakeStorage.release();
-        //     this.feverLayer.stop();
-        // }
         this.stageLayer.finish();
         const duration = 500;
         if (!this.speechBubbleTween) {
@@ -325,10 +331,9 @@ export class GameScene extends g.Scene {
     };
 
     private createSpeechBubble = (): SpeechBubble => {
-        const assetId = this.calcResultMessage();
         this.penguin.modified();
         const isUp = this.penguin.y > Penguin.SIZE * 2;
-        const bubble = new SpeechBubble(this, isUp, assetId);
+        const bubble = new SpeechBubble(this, isUp);
         bubble.opacity = 0;
         bubble.x = -this.penguin.width / 2;
         bubble.y = this.penguin.height * (isUp ? -0.5 : 1.25);
@@ -346,27 +351,40 @@ export class GameScene extends g.Scene {
         return bubble;
     };
 
-    private createSpeechBubbleTimeline = (bubble: g.E, duration: number): tl.Tween => this.timeline.create(bubble)
-        .wait(duration * 3)
-        .fadeIn(duration, tl.Easing.easeOutQuint)
-        .call(() => {
-            if (this.snowflakeStorage.isFull()) {
-                this.snowflakeStorage.release();
-                this.feverLayer.stop();
-            }
-        })
-        .wait(duration * 8)
-        .call(() => {
-            bubble.destroy();
-            this.runAwayPenguin();
+    private createSpeechBubbleTimeline = (bubble: SpeechBubble, duration: number): tl.Tween =>
+        this.timeline.create(bubble)
+            .wait(duration * 3)
+            .call(() => bubble.addMessage(this.calcResultMessage()))
+            .fadeIn(duration, tl.Easing.easeOutQuint)
+            .con()
+            .call(() => {
+                if (this.scoreLabel.isCounterStop()) {
+                    new SpawnSmoke(this, this.penguin);
+                    this.setTimeout(() => this.penguin.transform(), 150);
+                }
+            })
+            .call(() => {
+                if (this.snowflakeStorage.isFull()) {
+                    this.snowflakeStorage.release();
+                    this.feverLayer.stop();
+                }
+            })
+            .wait(duration * 8)
+            .call(() => {
+                bubble.destroy();
 
-            // 残り時間からBGMのフェイドアウトの時間を決める
-            const marginSec = 2; // 念のために2秒の余裕を設けておく
-            const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
-            const elapsedSec = Math.floor(g.game.age / g.game.fps);
-            const duration = (totalTimeLimit - elapsedSec - marginSec) * 1000;
-            this.audioController.fadeOut(MusicId.BGM, duration);
-        });
+                if (this.scoreLabel.isCounterStop()) {
+                    this.audioController.playSE(SoundId.SURPRISE);
+                }
+                this.runAwayPenguin();
+
+                // 残り時間からBGMのフェイドアウトの時間を決める
+                const marginSec = 2; // 念のために2秒の余裕を設けておく
+                const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
+                const elapsedSec = Math.floor(g.game.age / g.game.fps);
+                const duration = (totalTimeLimit - elapsedSec - marginSec) * 1000;
+                this.audioController.fadeOut(MusicId.BGM, duration);
+            });
 
     private calcResultMessage = () => {
         const collectRate = this.penguin.collectedSnowFlake / (this.stageLayer.snowflakeCount + 1);
@@ -480,7 +498,8 @@ export class GameScene extends g.Scene {
             const levelRate = 1 - remainingTime / this.timeLimit;
             const perSec = this.speedController.getPerSec();
             const ratio = this.snowflakeStorage.rate();
-            this.stageLayer.create(levelRate, speedRate, remainingTime, perSec, ratio);
+            const collectedRareSnowFlake = this.penguin.collectedRareSnowFlake;
+            this.stageLayer.create(levelRate, speedRate, remainingTime, perSec, ratio, collectedRareSnowFlake);
         }
     };
 
@@ -727,7 +746,7 @@ export class GameScene extends g.Scene {
         if (this.isClicked && x > this.camera.x && x < this.camera.x + g.game.width) {
             this.audioController.playSE(SoundId.SPLASH);
         }
-        new Splash(this, this.effectBackLayer, x);
+        new Splash(this, this.effectBackLayer, x, g.game.height);
     };
 
     private retryGame = (): void => {
@@ -741,6 +760,8 @@ export class GameScene extends g.Scene {
         this.timeline.create(this.blackout)
             .wait(GameScene.FAILED_INTERVAL_TIME)
             .moveX((g.game.width - this.blackout.width) / 2, Blackout.DURATION_TRANSITION)
+            .con()
+            .call(() => this.feverLayer.stop())
             .call(() => {
                 this.isPauseGame = true;
                 this.initGame();
@@ -802,6 +823,7 @@ export class GameScene extends g.Scene {
         this.snowflakeStorage = new SnowflakeStorage(this);
         this.snowflakeStorage.x = this.scoreLabel.x + this.scoreLabel.width + this.snowflakeStorage.width * 1.25;
         this.snowflakeStorage.y = this.scoreLabel.y + this.scoreLabel.height / 2;
+        this.snowflakeStorage.onFull = () => this.audioController.playSE(SoundId.FULL);
 
         this.feverLayer = new FeverLayer(this, this.snowflakeStorage);
 
@@ -824,7 +846,7 @@ export class GameScene extends g.Scene {
     private createBackgroungLayer = (): g.E => {
         const layer = new g.E({ scene: this, parent: this });
 
-        const backgroung = new g.Sprite({
+        const backgroungSky = new g.Sprite({
             scene: this,
             parent: layer,
             src: this.asset.getImageById("img_background"),
@@ -832,8 +854,8 @@ export class GameScene extends g.Scene {
 
         const starCount = 8;
         const starAsset = this.asset.getImageById("img_distant_star");
-        const w = (backgroung.width - starAsset.width * 2) / starCount;
-        const h = (backgroung.height * .4 - starAsset.height * 2) / 2;
+        const w = (backgroungSky.width - starAsset.width * 2) / starCount;
+        const h = (backgroungSky.height * .7 - starAsset.height * 2) / 2;
         for (let i = 0; i < 8; i++) {
             const star = new g.Sprite({
                 scene: this,
@@ -841,7 +863,7 @@ export class GameScene extends g.Scene {
             });
             star.x = this.param.random.generate() * w + (w * i) + star.width;
             star.y = this.param.random.generate() * h + (h * Math.floor(i % 2)) + Penguin.SIZE;
-            backgroung.append(star);
+            backgroungSky.append(star);
         }
 
         const moon = new g.Sprite({
@@ -851,9 +873,20 @@ export class GameScene extends g.Scene {
             anchorX: .5,
             anchorY: .5,
         });
-        moon.x = backgroung.width / 2 + moon.width * 2;
+        moon.x = backgroungSky.width / 2 + moon.width * 2;
         moon.y = moon.height * .5;
-        backgroung.append(moon);
+        backgroungSky.append(moon);
+
+        const surpriseLayer = new g.E({ scene: this, parent: layer });
+        this.surprisePenguin = new SurprisePenguin(this);
+        surpriseLayer.append(this.surprisePenguin);
+
+        const backgroungSea = new g.Sprite({
+            scene: this,
+            parent: layer,
+            src: this.asset.getImageById("img_background_sea"),
+        });
+        backgroungSea.y = g.game.height - backgroungSea.height;
 
         this.clouds = new Clouds(this, layer);
         this.driftIces = new DriftIces(this, layer);
