@@ -85,7 +85,7 @@
 			"type": "image",
 			"path": "image/img_background.png",
 			"width": 1280,
-			"height": 722
+			"height": 466
 		},
 		"img_splash": {
 			"type": "image",
@@ -315,11 +315,59 @@
 			"width": 524,
 			"height": 100
 		},
-		"img_exclamation_mark": {
+		"img_msg_omg": {
 			"type": "image",
-			"path": "image/img_exclamation_mark.png",
-			"width": 110,
-			"height": 110
+			"path": "image/img_msg_omg.png",
+			"width": 61,
+			"height": 25
+		},
+		"img_msg_amazing": {
+			"type": "image",
+			"path": "image/img_msg_amazing.png",
+			"width": 111,
+			"height": 27
+		},
+		"img_halo": {
+			"type": "image",
+			"path": "image/img_halo.png",
+			"width": 160,
+			"height": 160
+		},
+		"img_button_2024_winter_ver": {
+			"type": "image",
+			"path": "image/img_button_2024_winter_ver.png",
+			"width": 524,
+			"height": 100
+		},
+		"img_yellow_penguin": {
+			"type": "image",
+			"path": "image/img_yellow_penguin.png",
+			"width": 80,
+			"height": 80
+		},
+		"img_background_sea": {
+			"type": "image",
+			"path": "image/img_background_sea.png",
+			"width": 1280,
+			"height": 256
+		},
+		"se_surprise": {
+			"type": "audio",
+			"path": "audio/se_surprise",
+			"systemId": "sound",
+			"duration": 2119,
+			"hint": {
+				"extensions": [
+					".m4a",
+					".ogg"
+				]
+			}
+		},
+		"img_yellow_penguin_tail": {
+			"type": "image",
+			"path": "image/img_yellow_penguin_tail.png",
+			"width": 20,
+			"height": 10
 		},
 		"audioController": {
 			"type": "script",
@@ -421,6 +469,11 @@
 			"path": "script/game_scene/effect/splashFragments.js",
 			"global": true
 		},
+		"surprisePenguin": {
+			"type": "script",
+			"path": "script/game_scene/effect/surprisePenguin.js",
+			"global": true
+		},
 		"entity": {
 			"type": "script",
 			"path": "script/game_scene/entity/entity.js",
@@ -439,6 +492,11 @@
 		"gameScene": {
 			"type": "script",
 			"path": "script/game_scene/gameScene.js",
+			"global": true
+		},
+		"feverLayer": {
+			"type": "script",
+			"path": "script/game_scene/hud/feverLayer.js",
 			"global": true
 		},
 		"scoreLabel": {
@@ -481,6 +539,16 @@
 			"path": "script/game_scene/stage/wall.js",
 			"global": true
 		},
+		"gameSceneImpl2024Winter": {
+			"type": "script",
+			"path": "script/impl_2024_winter/gameSceneImpl2024Winter.js",
+			"global": true
+		},
+		"stageLayerImple2024Winter": {
+			"type": "script",
+			"path": "script/impl_2024_winter/stageLayerImple2024Winter.js",
+			"global": true
+		},
 		"main": {
 			"type": "script",
 			"path": "script/main.js",
@@ -501,44 +569,23 @@
 			"path": "script/_bootstrap.js",
 			"global": true
 		},
-		"img_msg_omg": {
+		"se_full": {
+			"type": "audio",
+			"path": "audio/se_full",
+			"systemId": "sound",
+			"duration": 1313,
+			"hint": {
+				"extensions": [
+					".m4a",
+					".ogg"
+				]
+			}
+		},
+		"img_drift_ice_wave": {
 			"type": "image",
-			"path": "image/img_msg_omg.png",
-			"width": 61,
-			"height": 25
-		},
-		"img_msg_amazing": {
-			"type": "image",
-			"path": "image/img_msg_amazing.png",
-			"width": 111,
-			"height": 27
-		},
-		"img_halo": {
-			"type": "image",
-			"path": "image/img_halo.png",
-			"width": 160,
-			"height": 160
-		},
-		"feverLayer": {
-			"type": "script",
-			"path": "script/game_scene/hud/feverLayer.js",
-			"global": true
-		},
-		"img_button_2024_winter_ver": {
-			"type": "image",
-			"path": "image/img_button_2024_winter_ver.png",
-			"width": 526,
-			"height": 105
-		},
-		"gameSceneImpl2024Winter": {
-			"type": "script",
-			"path": "script/impl_2024_winter/gameSceneImpl2024Winter.js",
-			"global": true
-		},
-		"stageLayerImple2024Winter": {
-			"type": "script",
-			"path": "script/impl_2024_winter/stageLayerImple2024Winter.js",
-			"global": true
+			"path": "image/img_drift_ice_wave.png",
+			"width": 109,
+			"height": 30
 		}
 	},
 	"moduleMainScripts": {
