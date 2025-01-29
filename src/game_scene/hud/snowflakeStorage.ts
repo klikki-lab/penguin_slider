@@ -2,6 +2,7 @@ export class SnowflakeStorage extends g.Pane {
 
     private static readonly DEFAULT_CAPACITY = 100;
 
+    private _onFull: () => void;
     private rect: g.FilledRect;
     private count = 0;
     private _isRelease = false;
@@ -82,6 +83,9 @@ export class SnowflakeStorage extends g.Pane {
         };
 
         this.count += count;
+        if (this.isFull()) {
+            this._onFull();
+        }
 
         const rate = this.rate();
         this.rect.height = this.height * (1 - rate);
@@ -110,4 +114,6 @@ export class SnowflakeStorage extends g.Pane {
     };
 
     get isRelease(): boolean { return this._isRelease; }
+
+    set onFull(callback: () => void) { this._onFull = callback; }
 } 
