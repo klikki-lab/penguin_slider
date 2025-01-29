@@ -1,6 +1,6 @@
 export class SpeechBubble extends g.Sprite {
 
-    constructor(scene: g.Scene, isUp: boolean = true, messageAssetId: string) {
+    constructor(scene: g.Scene, isUp: boolean = true) {
         const asset = scene.asset.getImageById("img_speech_bubble");
         const width = asset.width / 2;
         super({
@@ -13,17 +13,21 @@ export class SpeechBubble extends g.Sprite {
             anchorX: .5,
             anchorY: .5,
         });
+    }
+
+    addMessage = (messageAssetId: string): void => {
+        if (this.children && this.children.length > 0) return;
 
         new g.Sprite({
-            scene: scene,
-            src: scene.asset.getImageById(messageAssetId),
+            scene: this.scene,
+            src: this.scene.asset.getImageById(messageAssetId),
             parent: this,
             anchorX: .5,
             anchorY: .5,
             x: this.width / 2,
             y: this.height / 2,
         });
-    }
+    };
 
     up = (): void => {
         this.srcX = 0;
