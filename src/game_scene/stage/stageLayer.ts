@@ -104,8 +104,13 @@ export class StageLayer extends g.E {
      * @param remainingTime 残り時間
      * @param perSec        秒速
      * @param storageRate   雪の結晶が貯まった比率
+     * @param collectedRareSnowFlake 集めたレア結晶の数
      */
-    create = (levelRate: number, speedRate: number, remainingTime: number, perSec: number, storageRate: number): void => {
+    create = (
+        levelRate: number,
+        speedRate: number, remainingTime: number,
+        perSec: number, storageRate: number,
+        collectedRareSnowFlake: number): void => {
         if (!this.isEnd) {
             if (this.interval <= 0 && levelRate < 1) {
                 this.createNextWallData(levelRate, speedRate, remainingTime, perSec);
@@ -114,12 +119,15 @@ export class StageLayer extends g.E {
                     this.wallDuration--;
 
                     if (this.wallDuration === 0 && this.step - this.endBonusStep > StageLayer.COL) {
+                        const rareRate = collectedRareSnowFlake / this.rareSnowflakeCount;
                         if (storageRate >= 1) {
-                            this.startBonusArea(Math.floor(this.random.generate() * perSec * 1.5 + perSec * 2));
+                            this.startBonusArea(Math.floor((this.random.generate() + rareRate * .5) * perSec + perSec * 2));
                         } else {
+                            const bonusTimes = this.bonusTimes + 1
                             if (levelRate > 0.55 && levelRate < 0.92 && storageRate < .8 && //// 33s ～ 55.2s
-                                this.random.generate() < (speedRate * speedRate * speedRate) / ((this.bonusTimes + 1) * 2)) {
-                                this.startBonusArea(Math.floor(this.random.generate() * perSec * 1.5 + perSec * 2));
+                                this.random.generate() < (speedRate * speedRate * speedRate) / (bonusTimes * 2) + rareRate * 0.35 / bonusTimes) {
+                                // if (1) {
+                                this.startBonusArea(Math.floor((this.random.generate() + rareRate * .5) * perSec + perSec * 2));
                                 this.isSurpriseBonus = true;
                                 this.supriseBonusPattern = Math.floor(this.random.generate() * Object.keys(SupriseBonusPattern).length);
                                 this._onSurprise();
@@ -199,7 +207,7 @@ export class StageLayer extends g.E {
                         case SupriseBonusPattern.CHECKBOARD:
                             for (let i = offsetY; i < maxY; i++) {
                                 if ((stepIndex + i) % 2 === 1) {
-                                    this.appendBonusSnowflake(i);
+                                    this.appendBonusSnowflake(i, true);
                                     snowfrakeCount++;
                                 }
                             }
@@ -207,7 +215,7 @@ export class StageLayer extends g.E {
                         case SupriseBonusPattern.LATTICE:
                             for (let i = offsetY; i < maxY; i++) {
                                 if (i % 2 === 0 || stepIndex % 2 === 0) {
-                                    this.appendBonusSnowflake(i);
+                                    this.appendBonusSnowflake(i, true);
                                     snowfrakeCount++;
                                 }
                             }
@@ -217,9 +225,9 @@ export class StageLayer extends g.E {
                             const height = maxY - offsetY;
                             for (let i = offsetY; i < maxY; i++) {
                                 const waveY = ((Math.sin(stepIndex / 2) + 1) * (height / 2)) + offsetY;
-                                if (Math.abs(waveY - i) < 2) {
+                                if (Math.abs(waveY - i) <= 2) {
                                     const isReverse = this.supriseBonusPattern === SupriseBonusPattern.WAVE_REVERSE;
-                                    this.appendBonusSnowflake(isReverse ? (StageLayer.ROW + 1) - i : i);
+                                    this.appendBonusSnowflake(isReverse ? (StageLayer.ROW + 1) - i : i, true);
                                     snowfrakeCount++;
                                 }
                             }
@@ -247,7 +255,7 @@ export class StageLayer extends g.E {
                 }
             } else if (this.step - this.startBonusStep > 2 && this.bonusDuration > 2) {
                 for (let i = 3; i < StageLayer.ROW - 1; i++) {
-                    this.appendBonusSnowflake(i);
+                    this.appendBonusSnowflake(i, false);
                 }
                 this._snowFlakeCount++;
             }
@@ -275,12 +283,12 @@ export class StageLayer extends g.E {
         this.step++;
     };
 
-    private appendBonusSnowflake = (y: number): void => {
+    private appendBonusSnowflake = (y: number, isSurprise: boolean): void => {
         const wall = this.appendWall(this.step, 0, 0);
         const index = Math.floor(this.random.generate() * StageLayer.BONUS_SNOWFLAKE_ASSET_IDS.length);
         const assetId = StageLayer.BONUS_SNOWFLAKE_ASSET_IDS[index];
         const score = 200;
-        this.appendSnowFlake(wall.x, Entity.SIZE * y, assetId, score);
+        this.appendSnowFlake(wall.x, Entity.SIZE * y, assetId, score, isSurprise);
     };
 
     private createNextWallData = (levelRate: number, speedRate: number, remainingTime: number, perSec: number): void => {
@@ -437,8 +445,8 @@ export class StageLayer extends g.E {
         wall.append(snowCovered);
     };
 
-    private appendSnowFlake = (x: number, y: number, assetId: string, score: number): void => {
-        const snowFlake = new Snowflake(this.scene, assetId, score);
+    private appendSnowFlake = (x: number, y: number, assetId: string, score: number, isSurprise = false): void => {
+        const snowFlake = new Snowflake(this.scene, assetId, score, isSurprise);
         snowFlake.moveTo(x, y - Entity.SIZE / 2);
         this._snowflakes.append(snowFlake);
     };
