@@ -73,8 +73,8 @@ export class GameSceneImple2024Winter extends g.Scene {
         super({
             game: g.game,
             assetIds: [
-                "img_background", "img_distant_star", "img_moon",
-                "img_penguin", "img_penguin_beak", "img_penguin_tail", "img_exclamation_mark",
+                "img_background", "img_background_sea", "img_distant_star", "img_moon",
+                "img_penguin", "img_penguin_beak", "img_penguin_tail",
                 "img_ice_cube", "img_smoke",
                 "img_snowflake_01", "img_snowflake_02", "img_snowflake_03", "img_snowflake_04", "img_snowflake_05",
                 "img_wall", "img_snow_covered_01", "img_snow_covered_02",
@@ -297,10 +297,10 @@ export class GameSceneImple2024Winter extends g.Scene {
     };
 
     private createSpeechBubble = (): SpeechBubble => {
-        const assetId = this.calcResultMessage();
+        // const assetId = this.calcResultMessage();
         this.penguin.modified();
         const isUp = this.penguin.y > Penguin.SIZE * 2;
-        const bubble = new SpeechBubble(this, isUp, assetId);
+        const bubble = new SpeechBubble(this, isUp);
         bubble.opacity = 0;
         bubble.x = -this.penguin.width / 2;
         bubble.y = this.penguin.height * (isUp ? -0.5 : 1.25);
@@ -318,21 +318,23 @@ export class GameSceneImple2024Winter extends g.Scene {
         return bubble;
     };
 
-    private createSpeechBubbleTimeline = (bubble: g.E, duration: number): tl.Tween => this.timeline.create(bubble)
-        .wait(duration * 3)
-        .fadeIn(duration, tl.Easing.easeOutQuint)
-        .wait(duration * 8)
-        .call(() => {
-            bubble.destroy();
-            this.runAwayPenguin();
+    private createSpeechBubbleTimeline = (bubble: SpeechBubble, duration: number): tl.Tween =>
+        this.timeline.create(bubble)
+            .wait(duration * 3)
+            .call(() => bubble.addMessage(this.calcResultMessage()))
+            .fadeIn(duration, tl.Easing.easeOutQuint)
+            .wait(duration * 8)
+            .call(() => {
+                bubble.destroy();
+                this.runAwayPenguin();
 
-            // 残り時間からBGMのフェイドアウトの時間を決める
-            const marginSec = 2; // 念のために2秒の余裕を設けておく
-            const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
-            const elapsedSec = Math.floor(g.game.age / g.game.fps);
-            const duration = (totalTimeLimit - elapsedSec - marginSec) * 1000;
-            this.audioController.fadeOut(MusicId.BGM, duration);
-        });
+                // 残り時間からBGMのフェイドアウトの時間を決める
+                const marginSec = 2; // 念のために2秒の余裕を設けておく
+                const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
+                const elapsedSec = Math.floor(g.game.age / g.game.fps);
+                const duration = (totalTimeLimit - elapsedSec - marginSec) * 1000;
+                this.audioController.fadeOut(MusicId.BGM, duration);
+            });
 
     private calcResultMessage = () => {
         const collectRate = this.penguin.collectedSnowFlake / (this.stageLayer.snowflakeCount + 1);
@@ -674,7 +676,7 @@ export class GameSceneImple2024Winter extends g.Scene {
         if (this.isClicked && x > this.camera.x && x < this.camera.x + g.game.width) {
             this.audioController.playSE(SoundId.SPLASH);
         }
-        new Splash(this, this.effectBackLayer, x);
+        new Splash(this, this.effectBackLayer, x, g.game.height);
     };
 
     private retryGame = (): void => {
@@ -771,7 +773,7 @@ export class GameSceneImple2024Winter extends g.Scene {
         const starCount = 8;
         const starAsset = this.asset.getImageById("img_distant_star");
         const w = (backgroung.width - starAsset.width * 2) / starCount;
-        const h = (backgroung.height * .4 - starAsset.height * 2) / 2;
+        const h = (backgroung.height * .7 - starAsset.height * 2) / 2;
         for (let i = 0; i < 8; i++) {
             const star = new g.Sprite({
                 scene: this,
@@ -792,6 +794,13 @@ export class GameSceneImple2024Winter extends g.Scene {
         moon.x = backgroung.width / 2 + moon.width * 2;
         moon.y = moon.height * .5;
         backgroung.append(moon);
+
+        const backgroungSea = new g.Sprite({
+            scene: this,
+            parent: layer,
+            src: this.asset.getImageById("img_background_sea"),
+        });
+        backgroungSea.y = g.game.height - backgroungSea.height;
 
         this.clouds = new Clouds(this, layer);
         this.driftIces = new DriftIces(this, layer);
