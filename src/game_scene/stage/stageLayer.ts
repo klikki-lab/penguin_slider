@@ -22,7 +22,8 @@ export class StageLayer extends g.E {
     private static readonly SNOWFLAKE_ASSET_IDS = ["img_snowflake_01", "img_snowflake_02"];
     private static readonly BONUS_SNOWFLAKE_ASSET_IDS = ["img_snowflake_03", "img_snowflake_04", "img_snowflake_05"];
 
-    private static readonly MIN_WALL_WIDTH = 2;
+    private static readonly MIN_WALL_DURATION = 2;
+    private static readonly MIN_BONUS_DURATION = 8;
     private static readonly MIN_INTERVAL = 4;
     private static readonly EDGES_MASK = 0x101;
     private static readonly PITFALL_MASK = 0x1FC;
@@ -42,7 +43,7 @@ export class StageLayer extends g.E {
     private bonusDuration = 0;
     private startBonusStep = 0;
     private endBonusStep = 0;
-    private bonusTimes = 0;
+    private surpriseBonusTimes = 0;
     private endStep = 0;
     private isEnd = false;
     private isSurpriseBonus = false;
@@ -91,11 +92,28 @@ export class StageLayer extends g.E {
     needNextWall = (cameraX: number): boolean =>
         Math.floor(cameraX / Entity.SIZE) + StageLayer.COL + 1 > this.step;
 
-    private startBonusArea = (bonusDuration: number): void => {
-        this.bonusDuration = bonusDuration;
+
+    private calcBonusDuration = (speedRate: number, remainingTime: number, perSec: number, collectedRareSnowFlake: number): number => {
+        const penguinOffsetX = 3;
+        const arrivalTime = (StageLayer.COL - penguinOffsetX) / perSec;
+        if (remainingTime <= arrivalTime) { // 今からボーナスエリアを作ってもペンギンまで到達しないと判断した場合は作らない
+            return 0;
+        } else if (remainingTime <= arrivalTime * 1.8) {// 残り時間が少ない場合は残りはボーナスエリアにする
+            const addWidth = (remainingTime - arrivalTime) * perSec;
+            return Math.max(StageLayer.MIN_BONUS_DURATION, Math.floor(addWidth * (2 - speedRate)));
+        }
+        const rareRate = collectedRareSnowFlake / this.rareSnowflakeCount;
+        return Math.floor((this.random.generate() + rareRate * .5) * perSec + perSec * 2);
+    };
+
+    private startBonusArea = (speedRate: number, remainingTime: number, perSec: number, collectedRareSnowFlake: number): boolean => {
+        const calcDuration = this.calcBonusDuration(speedRate, remainingTime, perSec, collectedRareSnowFlake);
+        if (calcDuration <= 0) return false;
+
+        this.bonusDuration = calcDuration;
         this.startBonusStep = this.step;
         this.endBonusStep = this.step + this.bonusDuration;
-        this.bonusTimes++;
+        return true;
     };
 
     /**
@@ -108,9 +126,12 @@ export class StageLayer extends g.E {
      */
     create = (
         levelRate: number,
-        speedRate: number, remainingTime: number,
-        perSec: number, storageRate: number,
+        speedRate: number,
+        remainingTime: number,
+        perSec: number,
+        storageRate: number,
         collectedRareSnowFlake: number): void => {
+
         if (!this.isEnd) {
             if (this.interval <= 0 && levelRate < 1) {
                 this.createNextWallData(levelRate, speedRate, remainingTime, perSec);
@@ -119,18 +140,25 @@ export class StageLayer extends g.E {
                     this.wallDuration--;
 
                     if (this.wallDuration === 0 && this.step - this.endBonusStep > StageLayer.COL) {
-                        const rareRate = collectedRareSnowFlake / this.rareSnowflakeCount;
                         if (storageRate >= 1) {
-                            this.startBonusArea(Math.floor((this.random.generate() + rareRate * .5) * perSec + perSec * 2));
+                            this.startBonusArea(speedRate, remainingTime, perSec, collectedRareSnowFlake);
                         } else {
-                            const bonusTimes = this.bonusTimes + 1
-                            if (levelRate > 0.55 && levelRate < 0.92 && storageRate < .8 && //// 33s ～ 55.2s
-                                this.random.generate() < (speedRate * speedRate * speedRate) / (bonusTimes * 2) + rareRate * 0.35 / bonusTimes) {
-                                // if (1) {
-                                this.startBonusArea(Math.floor((this.random.generate() + rareRate * .5) * perSec + perSec * 2));
-                                this.isSurpriseBonus = true;
-                                this.supriseBonusPattern = Math.floor(this.random.generate() * Object.keys(SupriseBonusPattern).length);
-                                this._onSurprise();
+                            if (levelRate >= 0.45 && levelRate <= 0.9) { /* 27s ～ 55s */
+                                const fullRate = 1 - storageRate;
+                                if (this.random.generate() < fullRate * fullRate * fullRate) {
+                                    const bonusTimes = this.surpriseBonusTimes + 1;
+                                    const rareRate = collectedRareSnowFlake / this.rareSnowflakeCount;
+                                    const powSpeed = speedRate * speedRate * speedRate;
+                                    if (this.random.generate() < (powSpeed / (bonusTimes * 4)) + (rareRate * 0.5 / bonusTimes)) {
+                                        // if (1) {
+                                        if (this.startBonusArea(speedRate, remainingTime, perSec, collectedRareSnowFlake)) {
+                                            this.isSurpriseBonus = true;
+                                            this.supriseBonusPattern = Math.floor(this.random.generate() * Object.keys(SupriseBonusPattern).length);
+                                            this._onSurprise();
+                                            this.surpriseBonusTimes++;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -291,20 +319,22 @@ export class StageLayer extends g.E {
         this.appendSnowFlake(wall.x, Entity.SIZE * y, assetId, score, isSurprise);
     };
 
-    private createNextWallData = (levelRate: number, speedRate: number, remainingTime: number, perSec: number): void => {
+    private calcWallDuration = (speedRate: number, remainingTime: number, perSec: number): number => {
         const penguinOffsetX = 3;
         const arrivalTime = (StageLayer.COL - penguinOffsetX) / perSec; // ペンギンが壁（右端）に到達するおよその時間
         if (remainingTime <= arrivalTime) { // 今から壁を作ってもペンギンまで到達しないと判断した場合は壁を作らない
-            this.wallDuration = 0;
-        } else {
-            if (remainingTime <= arrivalTime * 1.8) {// 残り時間が少ない場合は残りは壁にする
-                const addWidth = (remainingTime - arrivalTime) * perSec;
-                this.wallDuration = Math.max(StageLayer.MIN_WALL_WIDTH, Math.floor(addWidth * (2 - speedRate)));
-            } else {
-                const col = StageLayer.COL / 2;
-                this.wallDuration = Math.floor(this.random.generate() * col) + StageLayer.MIN_WALL_WIDTH;
-            }
+            return 0;
+        } else if (remainingTime <= arrivalTime * 1.8) {// 残り時間が少ない場合は残りは壁にする
+            const addWidth = (remainingTime - arrivalTime) * perSec;
+            return Math.max(StageLayer.MIN_WALL_DURATION, Math.floor(addWidth * (2 - speedRate)));
+
         }
+        const col = StageLayer.COL / 2;
+        return Math.floor(this.random.generate() * col) + StageLayer.MIN_WALL_DURATION;
+    };
+
+    private createNextWallData = (levelRate: number, speedRate: number, remainingTime: number, perSec: number): void => {
+        this.wallDuration = this.calcWallDuration(speedRate, remainingTime, perSec);
         this.startWall = this.wallDuration;
 
         const level = Math.floor((StageLayer.LEVEL_MIN_OFFSETS.length - 1) * levelRate);
