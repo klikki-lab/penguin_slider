@@ -143,14 +143,13 @@ export class StageLayer extends g.E {
                         if (storageRate >= 1) {
                             this.startBonusArea(speedRate, remainingTime, perSec, collectedRareSnowFlake);
                         } else {
-                            if (levelRate >= 0.45 && levelRate <= 0.9) { /* 27s ～ 55s */
-                                const fullRate = 1 - storageRate;
-                                if (this.random.generate() < fullRate * fullRate * fullRate) {
+                            if (levelRate >= 0.4 && levelRate <= 0.92) { /* remaining 36s ～ 4.8s */
+                                const emptyRate = 1 - storageRate;
+                                if (this.random.generate() < emptyRate * emptyRate) {
                                     const bonusTimes = this.surpriseBonusTimes + 1;
                                     const rareRate = collectedRareSnowFlake / this.rareSnowflakeCount;
                                     const powSpeed = speedRate * speedRate * speedRate;
                                     if (this.random.generate() < (powSpeed / (bonusTimes * 4)) + (rareRate * 0.5 / bonusTimes)) {
-                                        // if (1) {
                                         if (this.startBonusArea(speedRate, remainingTime, perSec, collectedRareSnowFlake)) {
                                             this.isSurpriseBonus = true;
                                             this.supriseBonusPattern = Math.floor(this.random.generate() * Object.keys(SupriseBonusPattern).length);
