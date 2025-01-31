@@ -492,7 +492,7 @@ export class GameSceneImple2024Winter extends g.Scene {
                                 snowflake.obtain();
                                 this.penguin.obtainSnowflake(snowflake.score === 300);
                                 this.scoreLabel.addScore(snowflake.score);
-                                new SplashFragments(this, this.effectMiddleLayer, snowflake);
+                                new SplashFragments(this, this.effectMiddleLayer, (snowflake.src as g.ImageAsset).id, snowflake);
 
                                 const popupScore = new PopupScore(this, this.bitmapFont, snowflake.score);
                                 popupScore.x = this.scoreLabel.x + this.scoreLabel.width - popupScore.width;
