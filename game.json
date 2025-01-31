@@ -580,12 +580,6 @@
 					".ogg"
 				]
 			}
-		},
-		"img_drift_ice_wave": {
-			"type": "image",
-			"path": "image/img_drift_ice_wave.png",
-			"width": 109,
-			"height": 30
 		}
 	},
 	"moduleMainScripts": {
