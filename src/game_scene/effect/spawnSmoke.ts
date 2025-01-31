@@ -1,12 +1,12 @@
 export class SpawnSmoke extends g.Sprite {
 
-    constructor(scene: g.Scene, parent: g.E) {
+    constructor(scene: g.Scene, parent: g.E, pos?: g.CommonOffset) {
         super({
             scene: scene,
             src: scene.asset.getImageById("img_smoke"),
             parent: parent,
-            x: parent.width / 2,
-            y: parent.height / 2,
+            x: !pos ? parent.width / 2 : pos.x,
+            y: !pos ? parent.height / 2 : pos.y,
             anchorX: .5,
             anchorY: .5,
             angle: g.game.random.generate() * 360,
