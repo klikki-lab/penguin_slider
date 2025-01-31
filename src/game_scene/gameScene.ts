@@ -359,8 +359,14 @@ export class GameScene extends g.Scene {
             .con()
             .call(() => {
                 if (this.scoreLabel.isCounterStop()) {
-                    new SpawnSmoke(this, this.penguin);
-                    this.setTimeout(() => this.penguin.transform(), 150);
+                    const count = 4;
+                    for (let i = 0; i <= count; i++) {
+                        const rx = (g.game.random.generate() * 2 - 1) * this.penguin.width * .25;
+                        const ry = (g.game.random.generate() * 2 - 1) * this.penguin.height * .25;
+                        const pos = { x: this.penguin.width / 2 + rx, y: this.penguin.height / 2 + ry }
+                        this.setTimeout(() => new SpawnSmoke(this, this.penguin, pos), i * 50);
+                    }
+                    this.setTimeout(this.penguin.transform, count * 50);
                 }
             })
             .call(() => {
@@ -438,9 +444,16 @@ export class GameScene extends g.Scene {
                     this.penguin.modified();
 
                     const distance = prevX + this.penguin.width * .2;
-                    if (this.penguin.x > distance && (this.collideBottom(this.penguin, 1) instanceof Wall)) {
+                    if (this.penguin.x > distance) {
                         prevX = this.penguin.x;
-                        this.createSnowSmoke(this.penguin, speedRate);
+                        if ((this.collideBottom(this.penguin, 1) instanceof Wall)) {
+                            this.createSnowSmoke(this.penguin, speedRate);
+                        }
+                        if (this.scoreLabel.isCounterStop()) {
+                            const assetIds = ["img_snowflake_03", "img_snowflake_04", "img_snowflake_05"];
+                            const assetId = assetIds[Math.floor(g.game.random.generate() * assetIds.length)];
+                            new SplashFragments(this, this.effectMiddleLayer, assetId, this.penguin);
+                        }
                     }
                 }
             }
@@ -557,7 +570,7 @@ export class GameScene extends g.Scene {
                                 }
 
                                 this.scoreLabel.addScore(snowflake.score);
-                                new SplashFragments(this, this.effectMiddleLayer, snowflake);
+                                new SplashFragments(this, this.effectMiddleLayer, (snowflake.src as g.ImageAsset).id, snowflake);
 
                                 const popupScore = new PopupScore(this, this.bitmapFont, snowflake.score);
                                 popupScore.x = this.scoreLabel.x + this.scoreLabel.width - popupScore.width;
