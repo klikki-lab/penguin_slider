@@ -1,5 +1,4 @@
 import { Entity } from "../entity/entity";
-import { StageLayer } from "./stageLayer";
 
 export class Wall extends g.Sprite {
 
