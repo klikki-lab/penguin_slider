@@ -4,7 +4,7 @@ import { GameScene } from "./game_scene/gameScene";
 import { TitleScene, TitleSceneParams } from "./title_scene/titleScene";
 import { GameSceneImple2024Winter } from "./impl_2024_winter/gameSceneImpl2024Winter";
 
-const TimeLimit = {
+export const TimeLimit = {
     TitleScene: 7,
     GameScene: 60,
 } as const;

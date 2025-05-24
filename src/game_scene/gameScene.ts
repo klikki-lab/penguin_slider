@@ -27,6 +27,11 @@ import { SpeedController } from "./speedController";
 import { Snowflake } from "./stage/snowflake";
 import { StageLayer } from "./stage/stageLayer";
 import { Wall } from "./stage/wall";
+import { Button } from "../common/button";
+import { TitleScene, TitleSceneParams } from "../title_scene/titleScene";
+import { TimeLimit } from "../main";
+import { GameSceneImple2024Winter } from "../impl_2024_winter/gameSceneImpl2024Winter";
+import { WindowUtil } from "../common/windowUtil";
 
 const MusicId = {
     BGM: "bgm_nc366054",
@@ -49,7 +54,7 @@ export class GameScene extends g.Scene {
 
     private timeline: tl.Timeline;
     private hitTween: tl.Tween;
-    private speechBubbleTween: tl.Tween;
+    private speechBubbleTween: tl.Tween | undefined;
     private camera: g.Camera2D;
     private penguin: Penguin;
     private iceCubes: g.E;
@@ -108,7 +113,10 @@ export class GameScene extends g.Scene {
         this.speedController = new SpeedController(this.isEasyMode ?
             { firstlimit: 1, secondlimit: 1, thirdlimit: .1 } : {});
 
-        this.audioController = new AudioController(0.2, 0.1);
+        const isNicovideoJpDomain = WindowUtil.isNicovideoJpDomain();
+        const musicVolume = 0.2 * (isNicovideoJpDomain ? 1 : 0.25);
+        const soundVolume = 0.1 * (isNicovideoJpDomain ? 1 : 0.25);
+        this.audioController = new AudioController(musicVolume, soundVolume);
         const sounds = [
             { assetId: SoundId.SPLASH },
             { assetId: SoundId.SPAWN_ICE_CUBE },
@@ -257,6 +265,7 @@ export class GameScene extends g.Scene {
                 this.onUpdate.add(this.updateHandler);
                 this.onPointDownCapture.add(this.pointDownHandler);
                 this.onPointUpCapture.add(this.pointUpHandler);
+                start.destroy();
             });
     };
 
@@ -389,7 +398,28 @@ export class GameScene extends g.Scene {
                 const totalTimeLimit = this.param.sessionParameter?.totalTimeLimit ?? 80;
                 const elapsedSec = Math.floor(g.game.age / g.game.fps);
                 const duration = (totalTimeLimit - elapsedSec - marginSec) * 1000;
-                this.audioController.fadeOut(MusicId.BGM, duration);
+                const context = this.audioController.fadeOut(MusicId.BGM, duration);
+
+                if (WindowUtil.isNicovideoJpDomain()) return;
+
+                const retryText = this.createRetryButton();
+                this.hudLayer.append(retryText);
+
+                this.onPointDownCapture.add(_ev => {
+                    context.complete();
+                    this.audioController.stopMusic(MusicId.BGM);
+
+                    const titleScene = new TitleScene(TimeLimit.TitleScene);
+                    titleScene.onFinish = (params: TitleSceneParams): void => {
+                        if (params.is2024WinterMode && !params.isNormalMode && !params.isEasyMode) {
+                            g.game.replaceScene(new GameSceneImple2024Winter(this.param, params.isClicked, TimeLimit.GameScene));
+                        } else {
+                            const isEasyMode = !params.isNormalMode && params.isEasyMode;
+                            g.game.replaceScene(new GameScene(this.param, params.isClicked, isEasyMode, TimeLimit.GameScene));
+                        }
+                    };
+                    g.game.replaceScene(titleScene);
+                });
             });
 
     private calcResultMessage = () => {
@@ -475,6 +505,24 @@ export class GameScene extends g.Scene {
                 }
             }
         });
+    };
+
+    private createRetryButton = (): g.Label => {
+        const label = new g.Label({
+            scene: this,
+            font: this.bitmapFont,
+            text: "TAP TO RETRY",
+        });
+        label.x = (g.game.width - label.width) / 2;
+        label.y = g.game.height - label.height * 4;
+        let frame = 0;
+        const margin = 8;
+        const y = label.y;
+        label.onUpdate.add(() => {
+            label.y = y + Math.sin(frame++ / (g.game.fps * 2) * Math.PI) * margin;
+            label.modified();
+        });
+        return label;
     };
 
     private updateHandler = (): void | boolean => {

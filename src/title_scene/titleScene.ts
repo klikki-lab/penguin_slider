@@ -9,6 +9,7 @@ import { IceCube } from "../game_scene/entity/ice_cube";
 import { Penguin } from "../game_scene/entity/penguin";
 import { StageLayer } from "../game_scene/stage/stageLayer";
 import { Wall } from "../game_scene/stage/wall";
+import { WindowUtil } from "../common/windowUtil";
 
 export interface TitleSceneParams {
     isClicked: boolean;
@@ -144,9 +145,15 @@ export class TitleScene extends g.Scene {
         this.penguin.modified();
 
         if (this.penguin.x > g.game.width + this.penguin.getWidth() * 2) {
-            this.finishScene();
+            if (WindowUtil.isNicovideoJpDomain() ||
+                (this.isClickedStartButton || this.isClickedEasyModeButton || this.isClickedImpl2024WinterButton)) {
+                this.finishScene();
+            } else {
+                this.penguin.init();
+                this.prevX = this.penguin.x;
+            }
         } else if (!this.isClickedStartButton && !this.isClickedEasyModeButton && !this.isClickedImpl2024WinterButton &&
-            !this.bubble && this.penguin.x + this.penguin.width * 1.5 > g.game.width) {
+            !this.bubble && this.penguin.x + this.penguin.width * 1.5 > g.game.width && WindowUtil.isNicovideoJpDomain()) {
             const isUp = this.penguin.y > Penguin.SIZE * 2;
             this.bubble = new SpeechBubble(this, isUp);
             this.bubble.addMessage("img_msg_here_we_go");
@@ -164,6 +171,12 @@ export class TitleScene extends g.Scene {
             iceCube.x = this.penguin.x;
             iceCube.modified();
         });
+        for (let i = this.iceCubes.children?.length - 1; i >= 0; i--) {
+            const iceCube = this.iceCubes.children[i];
+            if (iceCube.x - iceCube.width / 2 > g.game.width) {
+                iceCube.destroy();
+            }
+        }
 
         if (this.penguin.x > this.prevX + this.penguin.width / 2) {
             const y = (StageLayer.ROW - 2) * this.penguin.height + this.penguin.height;

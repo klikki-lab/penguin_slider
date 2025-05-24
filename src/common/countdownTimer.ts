@@ -26,7 +26,7 @@ export class CountdownTimer {
 
     /**
      * カウントダウンを停止する。
-     * @returns カウントダウン中であれば true、そうでなければ false
+     * @returns カウントダウン中であれば `true`、そうでなければ `false`
      */
     stop = (): boolean => {
         if (!this.isStopped) {

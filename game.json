@@ -580,6 +580,11 @@
 					".ogg"
 				]
 			}
+		},
+		"windowUtil": {
+			"type": "script",
+			"path": "script/common/windowUtil.js",
+			"global": true
 		}
 	},
 	"moduleMainScripts": {
